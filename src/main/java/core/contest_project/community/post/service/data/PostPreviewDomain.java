@@ -1,6 +1,5 @@
 package core.contest_project.community.post.service.data;
 
-import core.contest_project.community.file.service.data.FileDomain;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,14 +19,8 @@ public class PostPreviewDomain {
     private Long commentCount;
 
     private LocalDateTime createAt;
-    private FileDomain thumbnail;
+    private String thumbnailUrl;
 
 
-    public String getThumbnailUrl() {
-        if(thumbnail != null) {
-            return thumbnail.getUrl();
-        }
-        return null;
-    }
 
 }

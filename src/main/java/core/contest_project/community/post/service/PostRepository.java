@@ -8,7 +8,7 @@ import org.springframework.data.domain.Slice;
 import java.time.LocalDateTime;
 
 public interface PostRepository {
-    Long save(PostInfo postInfo, Long userId);
+    Long save(PostInfo postInfo, Long userId, String thumbnailUrl);
 
     PostDomain findByPostIdJoinWriter(Long postId);
     PostUpdateDomain findByPostIdJoinWriterAndFilesForUpdate(Long postId);
@@ -19,7 +19,7 @@ public interface PostRepository {
     Slice<PostPreviewDomain> findPopularPosts(LocalDateTime onWeekAgo, Pageable pageable);
     Slice<PostActivityDomain>findPostsByTeamMemberCode(String teamMemberCode, Pageable pageable);
 
-    void update(Long postId, PostInfo info);
+    void update(Long postId, PostInfo info, String thumbnailUrl);
     void updateViewCount(Long postId);
     void increaseLikeCount(Long postId);
     void decreaseLikeCount(Long postId);

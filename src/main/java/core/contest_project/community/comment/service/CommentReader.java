@@ -2,9 +2,8 @@ package core.contest_project.community.comment.service;
 
 import core.contest_project.community.comment.service.date.*;
 import core.contest_project.community.comment_like.service.CommentLikeDomain;
-import core.contest_project.community.file.service.data.FileDomain;
-import core.contest_project.community.file.service.storage.FileManager;
-import core.contest_project.community.user.service.data.UserDomain;
+import core.contest_project.file.service.storage.FileManager;
+import core.contest_project.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +38,7 @@ public class CommentReader {
         Pageable pageable = PageRequest.of(page, 6, Sort.by(Sort.Direction.DESC, "createAt"));
         Slice<MyCommentDomain> comments = commentRepository.findAllByUserId(loginUser.getId(), pageable);
         List<MyCommentDomain> contents = comments.getContent();
-        setThumbnailUrls(contents);
+        //setThumbnailUrls(contents);
         return comments;
 
     }
@@ -55,7 +54,7 @@ public class CommentReader {
     }
 
 
-    private void setThumbnailUrls(List<MyCommentDomain> comments) {
+   /* private void setThumbnailUrls(List<MyCommentDomain> comments) {
         for (MyCommentDomain comment : comments) {
             FileDomain thumbnail = comment.getThumbnail();
             if (thumbnail != null) {
@@ -63,7 +62,7 @@ public class CommentReader {
                 thumbnail.setUrl(url);
             }
         }
-    }
+    }*/
 
     private void handleComment(List<CommentDomain> comments, UserDomain loginUser) {
         Long loginUserId = loginUser.getId();

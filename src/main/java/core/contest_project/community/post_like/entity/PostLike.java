@@ -1,7 +1,7 @@
 package core.contest_project.community.post_like.entity;
 
 import core.contest_project.community.post.entity.Post;
-import core.contest_project.community.user.entity.User;
+import core.contest_project.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

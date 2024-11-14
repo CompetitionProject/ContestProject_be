@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 public class PostUpdater {
     private final PostRepository postRepository;
 
-    public void update(Long postId, PostInfo info){
-        postRepository.update(postId, info);
+    public void update(Long postId, PostInfo info, String thumbnailUrl){
+        postRepository.update(postId, info, thumbnailUrl);
     }
 
 

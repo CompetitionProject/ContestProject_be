@@ -6,10 +6,9 @@ import core.contest_project.community.comment.service.date.CommentInfo;
 import core.contest_project.community.comment.service.date.MyCommentDomain;
 import core.contest_project.community.comment_like.entity.CommentLike;
 import core.contest_project.community.comment_like.service.CommentLikeDomain;
-import core.contest_project.community.file.service.data.FileDomain;
 import core.contest_project.community.post.entity.Post;
 import core.contest_project.community.post.service.data.PostPreviewDomain;
-import core.contest_project.community.user.entity.User;
+import core.contest_project.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -112,7 +111,6 @@ public class Comment {
     public MyCommentDomain toMyCommentDomain(){
         Long likeCount= (long) likes.size();
         PostPreviewDomain postDomain = getPost().toPostPreviewDomain(); // 여기서 comments 쿼리 하나 더 나감.
-        FileDomain thumbnail = postDomain.getThumbnail();
 
 
         return MyCommentDomain.builder()
@@ -124,7 +122,7 @@ public class Comment {
                 .postWriterNickname(postDomain.getWriterNickname())
                 .postViewCount(postDomain.getViewCount())
                 .postCreatedAt(postDomain.getCreateAt())
-                .thumbnail(thumbnail)
+                .thumbnailUrl(postDomain.getThumbnailUrl())
                 .build();
     }
 
