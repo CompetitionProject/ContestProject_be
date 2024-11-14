@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -56,6 +57,11 @@ public class UserRepositoryImpl implements UserRepository {
                 .orElseThrow(() -> new IllegalArgumentException("user not found"));
 
         return user.toDomain();
+    }
+
+    @Override
+    public UserDomain findByEmail(String email) {
+        return null;
     }
 
     @Override
