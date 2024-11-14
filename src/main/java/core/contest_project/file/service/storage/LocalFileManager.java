@@ -21,7 +21,6 @@ public class LocalFileManager implements FileManager {
     @Value("${base.dir}")
     private String baseDir;
 
-
     @Override
     public FileInfo upload(MultipartFile file)  {
         if(file.isEmpty()){return null;}

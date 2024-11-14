@@ -2,7 +2,6 @@ package core.contest_project.file;
 
 import core.contest_project.file.entity.File;
 import core.contest_project.file.service.FileRequest;
-import core.contest_project.file.service.data.FileDomain;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -44,7 +43,7 @@ public class FileUtil {
                     .location(location)
                     .url(file.url())
                     .uploadName(file.uploadFilename())
-                    .fileType(file.Type())
+                    .fileType(file.type())
                     .createAt(LocalDateTime.now())
                     .build();
 

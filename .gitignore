@@ -37,3 +37,20 @@ out/
 .vscode/
 
 application.properties
+
+### OS Generated Files ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Resources
+src/main/resources/
+**/resources/
+
+### Logs ###
+*.log
+logs/
