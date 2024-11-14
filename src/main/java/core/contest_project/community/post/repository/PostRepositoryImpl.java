@@ -1,12 +1,13 @@
 package core.contest_project.community.post.repository;
 
-import core.contest_project.community.global.exception.CustomException;
-import core.contest_project.community.global.exception.ErrorCode;
+import core.contest_project.file.repository.FileJpaRepository;
+import core.contest_project.global.exception.CustomException;
+import core.contest_project.global.exception.ErrorCode;
 import core.contest_project.community.post.entity.Post;
 import core.contest_project.community.post.service.PostRepository;
 import core.contest_project.community.post.service.data.*;
-import core.contest_project.community.user.entity.User;
-import core.contest_project.community.user.repository.UserJpaRepository;
+import core.contest_project.user.entity.User;
+import core.contest_project.user.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,9 +24,10 @@ import java.time.LocalDateTime;
 public class PostRepositoryImpl implements PostRepository {
     private final PostJpaRepository postJpaRepository;
     private final UserJpaRepository userJpaRepository;
+    private final FileJpaRepository fileJpaRepository;
 
     @Override
-    public Long save(PostInfo postInfo, Long userId) {
+    public Long save(PostInfo postInfo, Long userId, String thumbnailUrl) {
         User writer = userJpaRepository.getReferenceById(userId);
 
         Post post = Post.builder()
@@ -33,6 +35,7 @@ public class PostRepositoryImpl implements PostRepository {
                 .title(postInfo.title())
                 .contestTitle(postInfo.contestTitle())
                 .content(postInfo.content())
+                .thumbnailUrl(thumbnailUrl)
                 .viewCount(0L)
                 .likeCount(0L)
                 .createAt(LocalDateTime.now())
@@ -96,11 +99,11 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public void update(Long postId, PostInfo info) {
+    public void update(Long postId, PostInfo info, String thumbnailUrl) {
         Post post = postJpaRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "post not found"));
 
-        post.update(info);
+        post.update(info, thumbnailUrl);
     }
 
     @Override

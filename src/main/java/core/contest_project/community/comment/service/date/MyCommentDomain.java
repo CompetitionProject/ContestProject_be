@@ -1,6 +1,5 @@
 package core.contest_project.community.comment.service.date;
 
-import core.contest_project.community.file.service.data.FileDomain;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,12 +21,6 @@ public class MyCommentDomain {
     private String postWriterNickname;
     private Long postViewCount;
     private LocalDateTime postCreatedAt;
-    private FileDomain thumbnail;
+    private String thumbnailUrl;
 
-    public String getThumbnailUrl() {
-        if(thumbnail != null) {
-            return thumbnail.getUrl();
-        }
-        return null;
-    }
 }
