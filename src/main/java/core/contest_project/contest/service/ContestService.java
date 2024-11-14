@@ -3,19 +3,19 @@ package core.contest_project.contest.service;
 import core.contest_project.bookmark.dto.BookmarkStatus;
 import core.contest_project.bookmark.repository.BookmarkRepository;
 import core.contest_project.bookmark.service.BookmarkService;
+import core.contest_project.common.error.contest.ContestErrorResult;
+import core.contest_project.common.error.contest.ContestException;
 import core.contest_project.common.error.file.FileErrorResult;
 import core.contest_project.common.error.file.FileException;
-import core.contest_project.contest.dto.request.ContestUpdateRequest;
+import core.contest_project.common.error.user.UserErrorResult;
+import core.contest_project.common.error.user.UserException;
 import core.contest_project.contest.dto.request.ContestCreateRequest;
+import core.contest_project.contest.dto.request.ContestUpdateRequest;
 import core.contest_project.contest.dto.response.ContestApplicationInfo;
 import core.contest_project.contest.dto.response.ContestContentResponse;
 import core.contest_project.contest.dto.response.ContestResponse;
 import core.contest_project.contest.dto.response.ContestSimpleResponse;
 import core.contest_project.contest.entity.Contest;
-import core.contest_project.common.error.contest.ContestErrorResult;
-import core.contest_project.common.error.contest.ContestException;
-import core.contest_project.common.error.user.UserErrorResult;
-import core.contest_project.common.error.user.UserException;
 import core.contest_project.contest.entity.ContestField;
 import core.contest_project.contest.entity.ContestSortOption;
 import core.contest_project.contest.repository.ContestRepository;
@@ -322,7 +322,7 @@ public class ContestService {
     }
 
     private SingleFileResponse mapToFileResponse(File file) {
-        return new SingleFileResponse(file.getId(), file.getStoreName());
+        return new SingleFileResponse(file.getId(), file.getUrl());
     }
 
     private Long calculateRemainingDays(LocalDateTime endDate) {
@@ -366,10 +366,10 @@ public class ContestService {
                 .contestId(contest.getId())
                 .content(contest.getContent())
                 .contentImageUrls(contestWithImages.getContentImages().stream()
-                        .map(image -> new SingleFileResponse(image.getId(), image.getStoreName()))
+                        .map(image -> new SingleFileResponse(image.getId(), image.getUrl()))
                         .collect(Collectors.toList()))
                 .attachmentUrls(contestWithAttachments.getAttachments().stream()
-                        .map(attachment -> new SingleFileResponse(attachment.getId(), attachment.getStoreName()))
+                        .map(attachment -> new SingleFileResponse(attachment.getId(), attachment.getUrl()))
                         .collect(Collectors.toList()))
                 .build();
     }

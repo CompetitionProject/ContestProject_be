@@ -1,4 +1,4 @@
-/*
+package core.contest_project.contest.api;/*
 package core.contest.contest.api;
 
 import core.contest.contest.dto.request.ContestCreateRequest;

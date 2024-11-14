@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class CommentReader {
     private final CommentRepository commentRepository;
-    private final FileManager fileManager;
 
     public CommentDomain getComment(Long commentId){
         return commentRepository.findByCommentId(commentId);

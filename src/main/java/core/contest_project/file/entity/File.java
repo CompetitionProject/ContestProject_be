@@ -1,5 +1,6 @@
 package core.contest_project.file.entity;
 
+import core.contest_project.contest.entity.Contest;
 import core.contest_project.file.FileLocation;
 import core.contest_project.file.FileType;
 import core.contest_project.file.service.data.FileDomain;

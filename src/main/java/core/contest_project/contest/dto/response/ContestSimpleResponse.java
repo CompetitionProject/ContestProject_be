@@ -43,7 +43,7 @@ public record ContestSimpleResponse (
                 // posterUrl 처리
                 String posterUrl = null;
                 if (contest.getPosterImage() != null && !contest.getPosterImage().isEmpty()) {
-                        posterUrl = contest.getPosterImage().get(0).getStoreName();  // 첫 번째 포스터의 URL
+                        posterUrl = contest.getPosterImage().get(0).getUrl();  // 첫 번째 포스터의 URL
                 }
 
                 // contestFields를 String으로 변환

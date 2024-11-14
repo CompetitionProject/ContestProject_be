@@ -17,7 +17,9 @@ public class FileCreator {
     private final FileRepository fileRepository;
 
     public void saveAll(Long postId, List<File> files){
+        if (files == null || files.isEmpty()) {
+            return;
+        }
         fileRepository.saveAll(postId, files);
     }
-
 }

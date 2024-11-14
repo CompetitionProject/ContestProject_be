@@ -19,10 +19,10 @@ public record ContestContentResponse(
                 .contestId(contest.getId())
                 .content(contest.getContent())
                 .contentImageUrls(contest.getContentImages().stream()
-                                .map(image -> new SingleFileResponse(image.getId(), image.getStoreName()))
+                                .map(image -> new SingleFileResponse(image.getId(), image.getUrl()))
                                 .collect(Collectors.toList()))
                 .attachmentUrls(contest.getAttachments().stream()
-                                .map(attachment -> new SingleFileResponse(attachment.getId(), attachment.getStoreName()))
+                                .map(attachment -> new SingleFileResponse(attachment.getId(), attachment.getUrl()))
                                 .collect(Collectors.toList()))
                 .build();
     }

@@ -45,7 +45,7 @@ public record ContestResponse(
 ){
         public static ContestResponse from(Contest contest, boolean isBookmarked) {
                 SingleFileResponse posterUrl = contest.getPosterImage() != null && !contest.getPosterImage().isEmpty()
-                        ? new SingleFileResponse(contest.getPosterImage().get(0).getId(), contest.getPosterImage().get(0).getStoreName())
+                        ? new SingleFileResponse(contest.getPosterImage().get(0).getId(), contest.getPosterImage().get(0).getUrl())
                         : null;
 
                 Long remainingDays = ChronoUnit.DAYS.between(LocalDateTime.now(), contest.getEndDate());

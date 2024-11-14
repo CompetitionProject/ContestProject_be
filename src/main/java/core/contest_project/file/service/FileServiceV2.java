@@ -42,7 +42,7 @@ public class FileServiceV2 {
 
             return File.builder()
                     .contest(contest)
-                    .storeName(fileUrl)
+                    .url(fileUrl)
                     .uploadName(file.getOriginalFilename())
                     .fileType(fileType)
                     .location(FileLocation.CONTEST)
@@ -59,7 +59,7 @@ public class FileServiceV2 {
                 .orElseThrow(() -> new FileException(FileErrorResult.FILE_NOT_FOUND));
 
         try {
-            s3Service.deleteFile(file.getStoreName());
+            s3Service.deleteFile(file.getUrl());
             fileRepository.delete(file);
         } catch (Exception e) {
             throw new FileException(FileErrorResult.FILE_DELETE_ERROR);
@@ -76,7 +76,7 @@ public class FileServiceV2 {
 
         try {
             List<String> fileUrls = files.stream()
-                    .map(File::getStoreName)
+                    .map(File::getUrl)
                     .collect(Collectors.toList());
 
             s3Service.deleteFiles(fileUrls);

@@ -1,18 +1,20 @@
 package core.contest_project.file.service;
 
-import core.contest_project.file.service.data.FileInfo;
-import core.contest_project.file.service.storage.FileManager;
+import core.contest_project.common.error.file.FileErrorResult;
+import core.contest_project.common.error.file.FileException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class FileService {
-    private final FileManager fileManager;
-
+    private final S3Service s3Service;
     /**
      *
      * @param file
@@ -22,10 +24,15 @@ public class FileService {
      * 프로필 이미지 등록과 채팅 시 이미지 보내기에 사용할 예정입니다.
      */
     public String uploadOnlyStorage(MultipartFile file) {
-        FileInfo fileInfo = fileManager.upload(file);
-        return fileManager.getUrl(fileInfo.getStoreFileName());
+        try {
+            return s3Service.uploadFile(file);
+        } catch (IOException e) {
+            log.error("File upload failed", e);
+            throw new FileException(FileErrorResult.FILE_UPLOAD_ERROR);
+        }
     }
 
-
-
+    public List<String> uploadsOnlyStorage(List<MultipartFile> files) {
+        return s3Service.uploadFiles(files);
+    }
 }

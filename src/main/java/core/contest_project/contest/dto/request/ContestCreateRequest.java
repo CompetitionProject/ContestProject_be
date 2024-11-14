@@ -3,7 +3,7 @@ package core.contest_project.contest.dto.request;
 import core.contest_project.contest.entity.ContestApplicationMethod;
 import core.contest_project.contest.entity.ContestField;
 import core.contest_project.file.FileType;
-import core.contest_project.file.dto.FileRequest;
+import core.contest_project.file.service.FileRequest;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
