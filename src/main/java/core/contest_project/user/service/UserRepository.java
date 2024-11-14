@@ -8,6 +8,8 @@ public interface UserRepository {
 
      UserDomain findById(Long id) ;
      UserDomain findByNickname(String nickname);
+     UserDomain findByEmail(String email);
+
 
     void update(UserDomain user);
     void update(UserDomain user, UserInfo userInfo);
