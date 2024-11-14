@@ -2,11 +2,10 @@ package core.contest_project.community.post.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import core.contest_project.community.comment.entity.Comment;
-import core.contest_project.community.file.FileType;
-import core.contest_project.community.file.entity.File;
-import core.contest_project.community.file.service.data.FileDomain;
+import core.contest_project.file.entity.File;
+import core.contest_project.file.service.data.FileDomain;
 import core.contest_project.community.post.service.data.*;
-import core.contest_project.community.user.entity.User;
+import core.contest_project.user.entity.User;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -44,7 +43,7 @@ public class Post {
     @JsonIgnore
     private List<File> files;
 
-
+    private String thumbnailUrl;
     private String title;
     private String contestTitle;
     private String content;
@@ -61,28 +60,6 @@ public class Post {
     public PostPreviewDomain toPostPreviewDomain() {
         Long commentCount= (long) getComments().size();
 
-        FileDomain thumbnail=null;
-
-        if(getFiles()!=null && !getFiles().isEmpty()){
-            int minIdx=0;
-            boolean isImage=false;
-            int minOrder=99999;
-            for(int i=0;i<getFiles().size();i++){
-                File file = getFiles().get(i);
-                if(file.getFileType()== FileType.ATTACHMENT){continue;}
-                isImage=true;
-
-                if(file.getOrderIndex()<minOrder) {
-                    minIdx = i;
-                }
-
-            }
-            if(isImage)thumbnail= getFiles().get(minIdx).toDomain();
-        }
-
-
-
-
         return PostPreviewDomain.builder()
                 .postId(id)
                 .info(new PostInfo(title, contestTitle, content))
@@ -90,8 +67,8 @@ public class Post {
                 .likeCount(likeCount)
                 .viewCount(viewCount)
                 .createAt(createAt)
+                .thumbnailUrl(thumbnailUrl)
                 .commentCount(commentCount)
-                .thumbnail(thumbnail)
                 .build();
     }
 
@@ -118,9 +95,10 @@ public class Post {
                 .build();
     }
 
-    public void update(PostInfo info) {
+    public void update(PostInfo info, String thumbnailUrl) {
         title=info.title();
         contestTitle=info.contestTitle();
         content=info.content();
+        thumbnailUrl=thumbnailUrl;
     }
 }

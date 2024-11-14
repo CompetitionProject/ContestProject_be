@@ -2,7 +2,7 @@ package core.contest_project.community.comment_like.entity;
 
 import core.contest_project.community.comment.entity.Comment;
 import core.contest_project.community.comment_like.service.CommentLikeDomain;
-import core.contest_project.community.user.entity.User;
+import core.contest_project.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 

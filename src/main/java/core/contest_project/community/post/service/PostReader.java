@@ -1,21 +1,18 @@
 package core.contest_project.community.post.service;
 
-import core.contest_project.community.file.service.data.FileDomain;
-import core.contest_project.community.file.service.storage.FileManager;
 import core.contest_project.community.post.service.data.PostActivityDomain;
 import core.contest_project.community.post.service.data.PostDomain;
 import core.contest_project.community.post.service.data.PostPreviewDomain;
 import core.contest_project.community.post.service.data.PostSortType;
 import core.contest_project.community.post_like.service.PostLikeReader;
 import core.contest_project.community.scrap.service.ScrapReader;
-import core.contest_project.community.user.service.data.UserDomain;
+import core.contest_project.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -26,7 +23,6 @@ public class PostReader {
     private final PostRepository postRepository;
     private final PostLikeReader postLikeReader;
     private final ScrapReader scrapReader;
-    private final FileManager fileManager;
 
 
     public PostDomain getPost(Long postId, UserDomain loginUser) {
@@ -51,6 +47,7 @@ public class PostReader {
 
         // file
 
+
         // isWriter
         boolean isWriter = Objects.equals(postDomain.getWriter().getId(), loginUser.getId());
         postDomain.setIsWriter(isWriter);
@@ -61,7 +58,7 @@ public class PostReader {
     public Slice<PostPreviewDomain> getMostLikedPosts(Integer page) {
         Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, PostSortType.LIKE.getFieldName()));
         Slice<PostPreviewDomain> posts = postRepository.findSlice(pageable);
-        setThumbnailUrls(posts.getContent());
+        //setThumbnailUrls(posts.getContent());
         return posts;
     }
 
@@ -73,7 +70,7 @@ public class PostReader {
         oneWeekAgo = LocalDateTime.now().minusSeconds(30);
 
         Slice<PostPreviewDomain> popularPosts = postRepository.findPopularPosts(oneWeekAgo, pageable);
-        setThumbnailUrls(popularPosts.getContent());
+       // setThumbnailUrls(popularPosts.getContent());
         return popularPosts;
 
     }
@@ -89,7 +86,7 @@ public class PostReader {
         Pageable pageable = PageRequest.of(page, 6, Sort.by(Sort.Direction.DESC, sort.getFieldName()));
 
         Page<PostPreviewDomain> posts = postRepository.findPage(pageable);
-        setThumbnailUrls(posts.getContent());
+       // setThumbnailUrls(posts.getContent());
 
         return posts;
     }
@@ -98,7 +95,7 @@ public class PostReader {
         Pageable pageable = PageRequest.of(page, 6, Sort.by(Sort.Direction.DESC, sort));
 
         Slice<PostPreviewDomain> posts = postRepository.findScrapedPostsByUserId(loginUser.getId(), pageable);
-        setThumbnailUrls(posts.getContent());
+        //setThumbnailUrls(posts.getContent());
 
         return posts;
     }
@@ -107,12 +104,12 @@ public class PostReader {
         Pageable pageable = PageRequest.of(page, 6, Sort.by(Sort.Direction.DESC, "createAt"));
 
         Slice<PostPreviewDomain> posts = postRepository.findPostsByUserId(loginUser.getId(), pageable);
-        setThumbnailUrls(posts.getContent());
+        //setThumbnailUrls(posts.getContent());
 
         return posts;
     }
 
-    private void setThumbnailUrls(List<PostPreviewDomain> posts) {
+    /*private void setThumbnailUrls(List<PostPreviewDomain> posts) {
         for (PostPreviewDomain post : posts) {
             FileDomain thumbnail = post.getThumbnail();
             if (thumbnail != null) {
@@ -120,7 +117,7 @@ public class PostReader {
                 thumbnail.setUrl(url);
             }
         }
-    }
+    }*/
 }
 
 
