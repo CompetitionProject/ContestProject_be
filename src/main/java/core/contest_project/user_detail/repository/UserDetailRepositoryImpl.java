@@ -7,6 +7,7 @@ import core.contest_project.user_detail.entity.UserDetail;
 import core.contest_project.user_detail.service.UserDetailInfo;
 import core.contest_project.user_detail.service.UserDetailRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class UserDetailRepositoryImpl implements UserDetailRepository {
     private final UserDetailJpaRepository userDetailJpaRepository;
     private final UserJpaRepository userJpaRepository;
@@ -35,8 +37,10 @@ public class UserDetailRepositoryImpl implements UserDetailRepository {
 
     }
 
+    // 왜 쿼리 두 번 나감?
     @Override
     public UserDetailInfo findAllByUser(Long userId) {
+        log.info("[UserDetailRepositoryImpl][findAllByUser]");
         List<UserDetail> findUserDetails = userDetailJpaRepository.findAllByUserId(userId);
          List<String> contestExperiences=new ArrayList<>();
          List<String> awardUrls=new ArrayList<>();

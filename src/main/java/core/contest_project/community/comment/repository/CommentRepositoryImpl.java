@@ -78,10 +78,10 @@ public class CommentRepositoryImpl implements CommentRepository {
         log.info("[CommentRepositoryImpl][existsByParentId]");
         log.info("parentId= {}", parentId);
 
-        boolean b = commentJpaRepository.existsByParentId(parentId);
-        log.info("b= {}", b);
+        boolean isThereParent = commentJpaRepository.existsByParentId(parentId);
+        log.info("isThereParent= {}", isThereParent);
 
-        return b;
+        return isThereParent;
     }
 
 

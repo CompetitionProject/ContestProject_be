@@ -12,4 +12,6 @@ public interface RefreshTokenJpaRepository extends JpaRepository<RefreshToken, L
     @Query("select token from RefreshToken token where token.userId=:userId and token.isBlacklist is false")
     Optional<RefreshToken> findByUserIdAndBlacklistIsFalse(@Param("userId")Long userId);
     Optional<RefreshToken> findByUserIdAndRefreshToken(Long userId, String refreshToken);
+
+
 }

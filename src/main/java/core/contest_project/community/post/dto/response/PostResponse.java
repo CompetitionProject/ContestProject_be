@@ -1,8 +1,10 @@
 package core.contest_project.community.post.dto.response;
 
 import core.contest_project.community.post.service.data.PostDomain;
+import core.contest_project.file.service.FileResponse;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record PostResponse(
         Long postId,
@@ -24,7 +26,9 @@ public record PostResponse(
         boolean isScraped,
 
         Long likeCount,
-        boolean isLiked
+        boolean isLiked,
+
+        List<FileResponse> files
 ) {
 
     public static PostResponse from(PostDomain domain){
@@ -42,7 +46,8 @@ public record PostResponse(
                 domain.getScrapCount(),
                 domain.isScraped(),
                 domain.getLikeCount(),
-                domain.isLiked()
+                domain.isLiked(),
+                domain.getFiles()
         );
 
     }

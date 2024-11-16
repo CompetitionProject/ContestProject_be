@@ -1,5 +1,6 @@
 package core.contest_project.user.service;
 
+import core.contest_project.community.post.service.data.PostSortType;
 import core.contest_project.user.service.data.UserDomain;
 import core.contest_project.user.service.data.UserInfo;
 import core.contest_project.community.comment.service.CommentReader;
@@ -73,7 +74,7 @@ public class UserService {
         return new AccessAndRefreshToken(accessToken, refreshToken);
     }
 
-    public Slice<PostPreviewDomain> getScrapedPosts(Integer page, String sort, UserDomain loginUser) {
+    public Slice<PostPreviewDomain> getScrapedPosts(Integer page, PostSortType sort, UserDomain loginUser) {
 
         return postReader.getScrapedPosts(page, sort, loginUser);
     }
@@ -122,4 +123,9 @@ public class UserService {
         userDetailService.update(null, user);
 
     }
+
+    public void logout(UserDomain user){
+        refreshTokenRepository.doBlacklist(user.getId());
+    }
+
 }

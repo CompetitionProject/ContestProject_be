@@ -54,6 +54,20 @@ public interface PostJpaRepository extends JpaRepository<Post, Long> {
     Slice<Post> findPopularPosts(@Param("oneWeekAgo")LocalDateTime oneWeekAgo, Pageable pageable);
 
     @Query("select p from Post p" +
+            " join fetch p.writer" +
+            " left join fetch p.comments" +
+            " where p.createAt > :oneWeekAgo and p.contest.id=:contestId")
+    Slice<Post> findPopularTips(@Param("oneWeekAgo")LocalDateTime oneWeekAgo, Pageable pageable, @Param("contestId")Long contestId);
+
+    @Query("select p from Post p" +
+            " join fetch p.writer" +
+            " left join fetch p.comments" +
+            " where p.contest.id=:contestId")
+    Slice<Post> findRecentTips(Pageable pageable, @Param("contestId")Long contestId);
+
+
+
+    @Query("select p from Post p" +
             " where p.writer.teamMemberCode=:teamMemberCode")
     Slice<Post>findPostsByTeamMemberCode(@Param("teamMemberCode")String teamMemberCode,Pageable pageable);
 

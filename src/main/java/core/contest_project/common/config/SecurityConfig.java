@@ -35,7 +35,8 @@ public class SecurityConfig {
             "/webjars/**",
             /* swagger v3 */
             "/v3/api-docs/**",
-            "/swagger-ui/**"
+            "/swagger-ui/**",
+            "/swagger-ui/index.html"
     };
 
     @Bean
@@ -46,9 +47,9 @@ public class SecurityConfig {
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers(HttpMethod.POST, "/api/token-reissue", "/post-permit-all").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/permit-all", "/api/post/**", "/do-login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/oauth2/authorization/kakao").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/token-reissue", "/api/users/signup").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/departments", "/api/schools").permitAll()
                         .requestMatchers(SWAGGER_URIS).permitAll()
                         .anyRequest().authenticated()
                 )

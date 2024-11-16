@@ -1,5 +1,7 @@
 package core.contest_project.community.post.repository;
 
+import core.contest_project.contest.entity.Contest;
+import core.contest_project.contest.repository.ContestRepository;
 import core.contest_project.file.repository.FileJpaRepository;
 import core.contest_project.global.exception.CustomException;
 import core.contest_project.global.exception.ErrorCode;
@@ -24,7 +26,7 @@ import java.time.LocalDateTime;
 public class PostRepositoryImpl implements PostRepository {
     private final PostJpaRepository postJpaRepository;
     private final UserJpaRepository userJpaRepository;
-    private final FileJpaRepository fileJpaRepository;
+    private final ContestRepository contestRepository;
 
     @Override
     public Long save(PostInfo postInfo, Long userId, String thumbnailUrl) {
@@ -43,6 +45,28 @@ public class PostRepositoryImpl implements PostRepository {
                 .build();
 
         return postJpaRepository.save(post).getId();
+    }
+
+    @Override
+    public Long save(PostInfo postInfo, Long userId, String thumbnailUrl, Long contestId) {
+        Contest contest = contestRepository.getReferenceById(contestId);
+        User writer = userJpaRepository.getReferenceById(userId);
+
+        Post post = Post.builder()
+                .writer((writer))
+                .title(postInfo.title())
+                .contestTitle(postInfo.contestTitle())
+                .content(postInfo.content())
+                .thumbnailUrl(thumbnailUrl)
+                .viewCount(0L)
+                .likeCount(0L)
+                .createAt(LocalDateTime.now())
+                .nextAnonymousSeq(1L)
+                .contest(contest)
+                .build();
+
+        return postJpaRepository.save(post).getId();
+
     }
 
     @Override
@@ -84,6 +108,16 @@ public class PostRepositoryImpl implements PostRepository {
     @Override
     public Slice<PostPreviewDomain> findPopularPosts(LocalDateTime onWeekAgo, Pageable pageable) {
         return postJpaRepository.findPopularPosts(onWeekAgo,pageable).map(Post::toPostPreviewDomain);
+    }
+
+    @Override
+    public Slice<PostPreviewDomain> findPopularTips(LocalDateTime onWeekAgo, Pageable pageable, Long contestId) {
+        return postJpaRepository.findPopularTips(onWeekAgo, pageable, contestId).map(Post::toPostPreviewDomain);
+    }
+
+    @Override
+    public Slice<PostPreviewDomain> findRecentTips(Pageable pageable, Long contestId) {
+        return postJpaRepository.findRecentTips(pageable, contestId).map(Post::toPostPreviewDomain);
     }
 
     @Override

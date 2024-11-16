@@ -2,6 +2,7 @@ package core.contest_project.community.post.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import core.contest_project.community.comment.entity.Comment;
+import core.contest_project.contest.entity.Contest;
 import core.contest_project.file.entity.File;
 import core.contest_project.file.service.data.FileDomain;
 import core.contest_project.community.post.service.data.*;
@@ -54,6 +55,10 @@ public class Post {
     private LocalDateTime createAt;
 
     private Long nextAnonymousSeq;
+
+    @ManyToOne(fetch=LAZY)
+    @JoinColumn(name="contest_id")
+    private Contest contest;
 
 
 

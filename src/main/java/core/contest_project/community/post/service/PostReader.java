@@ -67,12 +67,23 @@ public class PostReader {
         LocalDateTime oneWeekAgo = LocalDateTime.now().minusWeeks(1);
 
         // test를 위해 30초 전으로 바꾸자.
-        oneWeekAgo = LocalDateTime.now().minusSeconds(30);
+//        oneWeekAgo = LocalDateTime.now().minusSeconds(30);
 
         Slice<PostPreviewDomain> popularPosts = postRepository.findPopularPosts(oneWeekAgo, pageable);
-       // setThumbnailUrls(popularPosts.getContent());
         return popularPosts;
 
+    }
+
+    public Slice<PostPreviewDomain> getPopularTips(Integer page, Integer size, Long contestId){
+        Pageable pageable=PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, PostSortType.LIKE.getFieldName()));
+        LocalDateTime oneWeekAgo = LocalDateTime.now().minusWeeks(1);
+
+        return postRepository.findPopularTips(oneWeekAgo, pageable, contestId);
+    }
+
+    public Slice<PostPreviewDomain> getRecentTips(Integer page, Integer size, Long contestId) {
+        Pageable pageable=PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, PostSortType.DATE.getFieldName()));
+        return postRepository.findRecentTips(pageable, contestId);
     }
 
     public Slice<PostActivityDomain> getPostsByTeamMemberCode(String teamMemberCode, Integer page){
@@ -91,8 +102,8 @@ public class PostReader {
         return posts;
     }
 
-    public Slice<PostPreviewDomain> getScrapedPosts(Integer page, String sort, UserDomain loginUser) {
-        Pageable pageable = PageRequest.of(page, 6, Sort.by(Sort.Direction.DESC, sort));
+    public Slice<PostPreviewDomain> getScrapedPosts(Integer page, PostSortType sort, UserDomain loginUser) {
+        Pageable pageable = PageRequest.of(page, 6, Sort.by(Sort.Direction.DESC, sort.getFieldName()));
 
         Slice<PostPreviewDomain> posts = postRepository.findScrapedPostsByUserId(loginUser.getId(), pageable);
         //setThumbnailUrls(posts.getContent());
@@ -109,15 +120,7 @@ public class PostReader {
         return posts;
     }
 
-    /*private void setThumbnailUrls(List<PostPreviewDomain> posts) {
-        for (PostPreviewDomain post : posts) {
-            FileDomain thumbnail = post.getThumbnail();
-            if (thumbnail != null) {
-                String url = fileManager.getUrl(thumbnail.getInfo().getStoreFileName());
-                thumbnail.setUrl(url);
-            }
-        }
-    }*/
+
 }
 
 

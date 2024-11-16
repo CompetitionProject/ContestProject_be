@@ -1,11 +1,13 @@
 package core.contest_project.community.post.service.data;
 
+import core.contest_project.file.service.FileResponse;
 import core.contest_project.user.service.data.UserDomain;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -30,7 +32,7 @@ public class PostDomain {
 
     private Long nextAnonymousSeq;
 
-//    private List<FileDomain> files;
+    private List<FileResponse> files;
 
     public void increaseViewCount() {
         viewCount++;
@@ -59,5 +61,9 @@ public class PostDomain {
 
     public boolean isWriter() {
         return isWriter;
+    }
+
+    public void setFiles(List<FileResponse> files) {
+        this.files = files;
     }
 }

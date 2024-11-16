@@ -96,6 +96,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             jsonResponse.put("nickname", kaKaoInfo.getNickname());
             jsonResponse.put("email", kaKaoInfo.getEmail());
             jsonResponse.put("profileUrl", kaKaoInfo.getProfileUrl());
+            jsonResponse.put(JwtTokenUtil.SIGN_TOKEN, JwtTokenUtil.generateSignToken());
         }
 
 

@@ -7,4 +7,5 @@ public interface RefreshTokenRepository {
     Long save(RefreshToken refreshToken);
     RefreshToken findByUserIdAndBlacklistIsFalse(Long userId);
     RefreshToken findByUserIdAndRefreshToken(Long userId, String refreshToken);
+    void doBlacklist(Long userId);
 }
