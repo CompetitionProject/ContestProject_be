@@ -29,4 +29,7 @@ public interface PostRepository {
     void updateNextAnonymousSeq(Long postId);
 
     void deleteByPostId(Long postId);
+
+
+    boolean existsById(Long postId);
 }

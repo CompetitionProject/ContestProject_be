@@ -1,10 +1,9 @@
 package core.contest_project.community.post.repository;
 
+import core.contest_project.common.error.post.PostErrorResult;
+import core.contest_project.common.error.post.PostException;
 import core.contest_project.contest.entity.Contest;
 import core.contest_project.contest.repository.ContestRepository;
-import core.contest_project.file.repository.FileJpaRepository;
-import core.contest_project.global.exception.CustomException;
-import core.contest_project.global.exception.ErrorCode;
 import core.contest_project.community.post.entity.Post;
 import core.contest_project.community.post.service.PostRepository;
 import core.contest_project.community.post.service.data.*;
@@ -72,14 +71,14 @@ public class PostRepositoryImpl implements PostRepository {
     @Override
     public PostDomain findByPostIdJoinWriter(Long id) {
       return postJpaRepository.findByPostIdJoinWriter(id)
-              .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "post not found")).toPostDomain();
+              .orElseThrow(() -> new PostException(PostErrorResult.POST_NOT_FOUND)).toPostDomain();
     }
 
 
     @Override
     public PostUpdateDomain findByPostIdJoinWriterAndFilesForUpdate(Long postId) {
         return postJpaRepository.findByPostIdJoinWriterAndFiles(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "post not found")).toUpdateDomain();
+                .orElseThrow(() -> new PostException(PostErrorResult.POST_NOT_FOUND)).toUpdateDomain();
     }
 
     @Override
@@ -133,9 +132,14 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
+    public boolean existsById(Long postId) {
+        return postJpaRepository.existsById(postId);
+    }
+
+    @Override
     public void update(Long postId, PostInfo info, String thumbnailUrl) {
         Post post = postJpaRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "post not found"));
+                .orElseThrow(() -> new PostException(PostErrorResult.POST_NOT_FOUND));
 
         post.update(info, thumbnailUrl);
     }

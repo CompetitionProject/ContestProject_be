@@ -59,7 +59,7 @@ public class CommentController {
                                               @AuthenticationPrincipal UserDomain loginUser) {
 
 
-        commentService.delete(commentId, loginUser);
+        commentService.delete(postId, commentId, loginUser);
 
         return ResponseEntity.noContent().build();
     }

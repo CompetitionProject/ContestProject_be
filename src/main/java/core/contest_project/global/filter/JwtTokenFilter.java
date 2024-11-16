@@ -32,10 +32,23 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     final String BEARER = "Bearer ";
 
+    private static final String[] SWAGGER_URIS = {
+            "/swagger-ui",
+            "/v3/api-docs",
+            "/swagger-ui/index.html",
+            "/test"
+    };
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String requestURI = request.getRequestURI();
 
+        // Swagger 관련 경로와 /api/token-reissue 경로는 필터를 적용하지 않음 자꾸 로그 뜸.
+        for (String uri : SWAGGER_URIS) {
+            if (requestURI.startsWith(uri)) {
+                return true;
+            }
+        }
 
         // /api/token-reissue 경로도 필터 제외
         return "/api/token-reissue".equals(requestURI);
@@ -59,6 +72,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         log.info("requestURI= {}", requestURI);
 
 
+
         if (header == null || !header.startsWith(BEARER)) {
             // 로그인이 필요한 경우.
             log.warn("Authorization Header does not start with Bearer");
@@ -79,6 +93,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             }
             else if(tokenType.equals(JwtTokenUtil.ACCESS_TOKEN)){
+                if(Objects.equals(requestURI, "/api/users/signup")){
+                    log.info("[access token 으로 가입 시도]");
+                   // throw new IllegalArgumentException("token is sign_token");
+                    return;
+                }
+
                 Long userId = claims.get(USER_ID, Long.class);
                 log.info("userId= {}", userId);
                 UserDomain user = UserDomain.builder()
@@ -95,9 +115,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
                 return;
             }
-
-
-
 
 
 

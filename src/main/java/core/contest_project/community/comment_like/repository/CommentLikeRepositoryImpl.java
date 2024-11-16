@@ -1,5 +1,7 @@
 package core.contest_project.community.comment_like.repository;
 
+import core.contest_project.common.error.comment.CommentErrorResult;
+import core.contest_project.common.error.comment.CommentException;
 import core.contest_project.community.comment.entity.Comment;
 import core.contest_project.community.comment.repository.CommentJpaRepository;
 import core.contest_project.community.comment_like.entity.CommentLike;
@@ -80,7 +82,9 @@ public class CommentLikeRepositoryImpl implements CommentLikeRepository {
     @Override
     public void save(Long commentId, Long userId) {
         User findUser = userJpaRepository.getReferenceById(userId);
-        Comment findComment = commentJpaRepository.getReferenceById(commentId);
+        Comment findComment = commentJpaRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(CommentErrorResult.COMMENT_NOT_FOUND));
+
 
 
         CommentLike like = CommentLike.builder()

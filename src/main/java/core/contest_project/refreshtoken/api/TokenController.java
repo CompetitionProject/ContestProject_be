@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -100,6 +101,18 @@ public class TokenController {
         }
 
         return ResponseEntity.ok(jsonResponse);
+    }
+
+
+    @PostMapping("/test/generate-token")
+    public ResponseEntity<Map> generateToken(@RequestParam("userId") Long userId){
+        log.info("[TokenController][generateToken]");
+
+        String accessToken = JwtTokenUtil.generateAccessToken(userId);
+        Map<String, String> response = new HashMap<>();
+        response.put(JwtTokenUtil.ACCESS_TOKEN, accessToken);
+        return ResponseEntity.ok(response);
+
     }
 
 

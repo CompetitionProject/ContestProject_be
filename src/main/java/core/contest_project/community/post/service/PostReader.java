@@ -120,6 +120,11 @@ public class PostReader {
         return posts;
     }
 
+    public boolean existsById(Long postId){
+        return postRepository.existsById(postId);
+    }
+
+
 
 }
 

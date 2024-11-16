@@ -1,9 +1,12 @@
 package core.contest_project.community.comment.service;
 
+import core.contest_project.common.error.post.PostErrorResult;
+import core.contest_project.common.error.post.PostException;
 import core.contest_project.community.comment.service.date.CommentActivityDomain;
 import core.contest_project.community.comment.service.date.CommentDomain;
 import core.contest_project.community.comment.service.date.MyCommentDomain;
 import core.contest_project.community.comment.service.date.ParentCommentDomain;
+import core.contest_project.community.post.service.PostReader;
 import core.contest_project.community.post.service.PostRepository;
 import core.contest_project.community.post.service.data.PostDomain;
 import core.contest_project.user.service.data.UserDomain;
@@ -84,7 +87,7 @@ public class CommentService {
      *
      */
 
-    public void delete(Long commentId, UserDomain loginUser) {
+    public void delete(Long postId, Long commentId, UserDomain loginUser) {
         log.info("[CommentService][delete]");
         // 댓글 조회.
 
