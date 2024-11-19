@@ -2,6 +2,10 @@ package core.contest_project.contest.api;
 
 import core.contest_project.bookmark.dto.BookmarkStatus;
 import core.contest_project.bookmark.dto.BookmarkStatusResponse;
+import core.contest_project.community.post.dto.request.PostRequest;
+import core.contest_project.community.post.dto.response.PostPreviewResponse;
+import core.contest_project.community.post.service.PostService;
+import core.contest_project.community.post.service.data.PostPreviewDomain;
 import core.contest_project.contest.dto.request.ContestCreateRequest;
 import core.contest_project.contest.dto.request.ContestUpdateRequest;
 import core.contest_project.contest.dto.response.ContestApplicationInfo;
@@ -11,6 +15,7 @@ import core.contest_project.contest.dto.response.ContestSimpleResponse;
 import core.contest_project.contest.entity.ContestField;
 import core.contest_project.contest.entity.ContestSortOption;
 import core.contest_project.contest.service.ContestService;
+import core.contest_project.file.service.FileRequest;
 import core.contest_project.user.service.data.UserDomain;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,6 +35,7 @@ public class ContestControllerV1 {
 
     private final ContestService contestService;
     private static final int PAGE_SIZE = 20;
+    private final PostService postService;  // 2dt
 
     /*// 공모전 생성
     @PostMapping(value = "/{login-id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -208,5 +216,52 @@ public class ContestControllerV1 {
 //
 //    }
 
+
+    // ===== [추가][2dt] ===== //
+    @PostMapping("/{contestId}/tips")
+    public ResponseEntity<Long> createTip(@PathVariable Long contestId,
+                                          @RequestBody PostRequest request,
+                                          @RequestParam Long userId){
+
+        // 임시로
+        UserDomain writer = UserDomain.builder()
+                .id(userId)
+                .build();
+
+        List<FileRequest> files = request.files();
+
+        Long postId = postService.createTip(request.toPostInfo(), files, writer, contestId);
+
+
+        return ResponseEntity.ok(postId);
+    }
+
+    @GetMapping("/{contestId}/popular-tips")
+    public ResponseEntity<Slice<PostPreviewResponse>> getPopularTips(@PathVariable Long contestId,
+                                                              @RequestParam Long userId,
+                                                              @RequestParam Integer page){
+        // 임시로
+        UserDomain writer = UserDomain.builder()
+                .id(userId)
+                .build();
+
+        Slice<PostPreviewResponse> tips = postService.getPopularTips(page, contestId).map(PostPreviewResponse::from);
+
+        return ResponseEntity.ok(tips);
+    }
+
+    @GetMapping("/{contestId}/recent-tips")
+    public ResponseEntity<Slice<PostPreviewResponse>> getRecentTips(@PathVariable Long contestId,
+                                                                     @RequestParam Long userId,
+                                                                     @RequestParam Integer page){
+        // 임시로
+        UserDomain writer = UserDomain.builder()
+                .id(userId)
+                .build();
+
+        Slice<PostPreviewResponse> tips = postService.getRecentTips(page, contestId).map(PostPreviewResponse::from);
+
+        return ResponseEntity.ok(tips);
+    }
 
 }

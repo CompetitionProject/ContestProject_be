@@ -1,5 +1,7 @@
 package core.contest_project.community.comment.repository;
 
+import core.contest_project.common.error.comment.CommentErrorResult;
+import core.contest_project.common.error.comment.CommentException;
 import core.contest_project.community.comment.entity.Comment;
 import core.contest_project.community.comment.service.*;
 import core.contest_project.community.comment.service.date.*;
@@ -37,7 +39,10 @@ public class CommentRepositoryImpl implements CommentRepository {
         User writer = userJpaRepository.getReferenceById(info.getWriterDomain().getId());
         Post post = postJpaRepository.getReferenceById(postDomain.getId());
         Comment parent=null;
-        if(info.isReply()){parent  = commentJpaRepository.getReferenceById(info.getParentId());}
+        if(info.isReply()){
+            parent= commentJpaRepository.findById(info.getParentId())
+                    .orElseThrow(() -> (new CommentException(CommentErrorResult.COMMENT_NOT_FOUND)));
+        }
 
         Comment comment = Comment.builder()
                 .post(post)
@@ -56,8 +61,9 @@ public class CommentRepositoryImpl implements CommentRepository {
     @Override
     public CommentDomain findByCommentId(Long commentId) {
         return commentJpaRepository.findByCommentId(commentId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "comment not found"))
+                .orElseThrow(() -> new CommentException(CommentErrorResult.COMMENT_NOT_FOUND))
                 .toCommentDomain();
+
     }
 
 
@@ -78,10 +84,10 @@ public class CommentRepositoryImpl implements CommentRepository {
         log.info("[CommentRepositoryImpl][existsByParentId]");
         log.info("parentId= {}", parentId);
 
-        boolean b = commentJpaRepository.existsByParentId(parentId);
-        log.info("b= {}", b);
+        boolean isThereParent = commentJpaRepository.existsByParentId(parentId);
+        log.info("isThereParent= {}", isThereParent);
 
-        return b;
+        return isThereParent;
     }
 
 

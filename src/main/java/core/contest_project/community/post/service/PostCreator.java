@@ -17,4 +17,8 @@ public class PostCreator {
         return postRepository.save(post, user.getId(), thumbnailUrl);
     }
 
+    public Long create(PostInfo post, UserDomain user, String thumbnailUrl, Long contestId){
+        return postRepository.save(post, user.getId(), thumbnailUrl, contestId);
+    }
+
 }

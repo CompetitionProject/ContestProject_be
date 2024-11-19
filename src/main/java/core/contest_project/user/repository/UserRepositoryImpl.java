@@ -52,6 +52,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public UserDomain findUserProfile(Long id) {
+        return null;
+    }
+
+    @Override
     public UserDomain findByNickname(String nickname) {
         User user = userJpaRepository.findByNickname(nickname)
                 .orElseThrow(() -> new IllegalArgumentException("user not found"));

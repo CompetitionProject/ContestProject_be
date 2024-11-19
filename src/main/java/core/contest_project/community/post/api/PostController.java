@@ -8,11 +8,13 @@ import core.contest_project.community.post.service.PostService;
 import core.contest_project.community.post.service.data.PostDomain;
 import core.contest_project.community.post.service.data.PostSortType;
 import core.contest_project.user.service.data.UserDomain;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,14 +27,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class PostController {
     private final PostService postService;
-        // commit test!
-    @PostMapping("/api/community/posts/new/{login-id}")
-    public ResponseEntity<Map> writer(@PathVariable("login-id") Long loginUserId,
-                                      @RequestBody PostRequest request){
-        // 임시로
-        UserDomain writer = UserDomain.builder()
-                .id(loginUserId)
-                .build();
+
+    @PostMapping("/api/community/posts/new")
+    public ResponseEntity<Map> writer(@Valid @RequestBody PostRequest request,
+                                      @AuthenticationPrincipal UserDomain writer){
 
         List<FileRequest> files = request.files();
 
@@ -45,13 +43,10 @@ public class PostController {
     }
 
 
-    @GetMapping("/api/community/posts/{post-id}/{login-id}")
+
+    @GetMapping("/api/community/posts/{post-id}")
     public ResponseEntity<PostResponse> getPost(@PathVariable("post-id") Long postId,
-                                                @PathVariable("login-id") Long loginUserId) {
-        // 임시로
-        UserDomain loginUser = UserDomain.builder()
-                .id(loginUserId)
-                .build();
+                                                @AuthenticationPrincipal UserDomain loginUser) {
 
         PostDomain postDomain = postService.getPost(postId, loginUser);
         PostResponse response = PostResponse.from(postDomain);
@@ -59,16 +54,10 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/api/community/posts/{post-id}/{login-id}")
+    @PutMapping("/api/community/posts/{post-id}")
     public ResponseEntity<Void> update(@PathVariable("post-id") Long postId,
-                                       @PathVariable("login-id") Long loginUserId,
-                                       @RequestBody PostRequest request) {
-        // 임시로
-        UserDomain loginUser = UserDomain.builder()
-                .id(loginUserId)
-                .build();
-
-
+                                       @Valid @RequestBody PostRequest request,
+                                       @AuthenticationPrincipal UserDomain loginUser) {
 
         postService.update(postId, request.toPostInfo(), loginUser, request.files());
 
@@ -76,19 +65,12 @@ public class PostController {
 
     }
 
-    @DeleteMapping("/api/community/posts/{post-id}/{login-id}")
+    @DeleteMapping("/api/community/posts/{post-id}")
     public ResponseEntity<Void> delete(@PathVariable("post-id") Long postId,
-                                       @PathVariable("login-id") Long loginUserId) {
-
-        // 임시로
-        UserDomain loginUser = UserDomain.builder()
-                .id(loginUserId)
-                .build();
-
+                                       @AuthenticationPrincipal UserDomain loginUser) {
 
         postService.delete(postId, loginUser);
-
-       return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();
     }
 
 

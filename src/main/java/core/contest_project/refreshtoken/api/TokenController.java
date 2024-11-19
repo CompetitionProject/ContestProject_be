@@ -12,8 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,9 +41,15 @@ public class TokenController {
      */
 
     @PostMapping("/api/token-reissue")
-    public ResponseEntity<Map> reissueToken(@CookieValue(name="refreshToken")String refreshToken){
+    public ResponseEntity<Map> reissueToken(@CookieValue("refreshToken")String refreshToken){
         log.info("[TokenController][reissueToken]");
         // 임시로 map 이요하자
+        if(refreshToken == null){
+            log.info("refreshToken is null");
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "refreshToken is null");
+            return ResponseEntity.ok().body(response);
+        }
         Map<String, String> jsonResponse = new ConcurrentHashMap<>();
         try{
             log.info("refreshToken= {}", refreshToken);
@@ -93,6 +101,18 @@ public class TokenController {
         }
 
         return ResponseEntity.ok(jsonResponse);
+    }
+
+
+    @PostMapping("/test/generate-token")
+    public ResponseEntity<Map> generateToken(@RequestParam("userId") Long userId){
+        log.info("[TokenController][generateToken]");
+
+        String accessToken = JwtTokenUtil.generateAccessToken(userId);
+        Map<String, String> response = new HashMap<>();
+        response.put(JwtTokenUtil.ACCESS_TOKEN, accessToken);
+        return ResponseEntity.ok(response);
+
     }
 
 

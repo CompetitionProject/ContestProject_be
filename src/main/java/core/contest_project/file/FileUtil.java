@@ -2,6 +2,7 @@ package core.contest_project.file;
 
 import core.contest_project.file.entity.File;
 import core.contest_project.file.service.FileRequest;
+import core.contest_project.file.service.FileResponse;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -52,6 +53,16 @@ public class FileUtil {
         }
 
         return fileList;
+    }
+
+    public static List<FileResponse> toResponse(List<File> files){
+        List<FileResponse> fileResponseList = new ArrayList<>();
+        for (File file : files) {
+            fileResponseList.add(new FileResponse(file.getUrl(), file.getUploadName(), file.getFileType()));
+
+
+        }
+        return fileResponseList;
     }
 
 }

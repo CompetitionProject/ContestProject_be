@@ -32,13 +32,25 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     final String BEARER = "Bearer ";
 
+    private static final String[] SWAGGER_URIS = {
+            "/swagger-ui",
+            "/v3/api-docs",
+            "/swagger-ui/index.html",
+            "/test"
+    };
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        // Get the request URI
-
         String requestURI = request.getRequestURI();
 
-        // Check if the URI matches the path you want to exclude
+        // Swagger 관련 경로와 /api/token-reissue 경로는 필터를 적용하지 않음 자꾸 로그 뜸.
+        for (String uri : SWAGGER_URIS) {
+            if (requestURI.startsWith(uri)) {
+                return true;
+            }
+        }
+
+        // /api/token-reissue 경로도 필터 제외
         return "/api/token-reissue".equals(requestURI);
     }
 
@@ -60,6 +72,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         log.info("requestURI= {}", requestURI);
 
 
+
         if (header == null || !header.startsWith(BEARER)) {
             // 로그인이 필요한 경우.
             log.warn("Authorization Header does not start with Bearer");
@@ -71,11 +84,32 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         try{
             Claims claims = JwtTokenUtil.extractAllClaims(token);
-
+            log.info("토큰이 정상입니다.");
             String tokenType = JwtTokenUtil.getTokenType(claims);
 
-            // 뭔가 있지만 accessToken 아님.
-            if(!Objects.equals(tokenType, JwtTokenUtil.ACCESS_TOKEN)){
+
+            if(tokenType.equals(JwtTokenUtil.SIGN_TOKEN)){
+                log.info("token is sign_token");
+                filterChain.doFilter(request, response);
+            }
+            else if(tokenType.equals(JwtTokenUtil.ACCESS_TOKEN)){
+                if(Objects.equals(requestURI, "/api/users/signup")){
+                    log.info("[access token 으로 가입 시도]");
+                   // throw new IllegalArgumentException("token is sign_token");
+                    return;
+                }
+
+                Long userId = claims.get(USER_ID, Long.class);
+                log.info("userId= {}", userId);
+                UserDomain user = UserDomain.builder()
+                        .id(userId)
+                        .build();
+
+                saveAuthentication(user);
+
+                filterChain.doFilter(request, response);
+            }
+            else{
                 // 다시 로그인 시키자.
                 log.warn("token is not access token");
                 filterChain.doFilter(request, response);
@@ -83,17 +117,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             }
 
 
-            log.info("토큰이 정상입니다.");
 
-            Long userId = claims.get(USER_ID, Long.class);
-            log.info("userId= {}", userId);
-            UserDomain user = UserDomain.builder()
-                            .id(userId)
-                            .build();
-
-            saveAuthentication(user);
-
-            filterChain.doFilter(request, response);
         }catch (SignatureException e){
             // 서명 이상함
             log.info("서명 이상함.");

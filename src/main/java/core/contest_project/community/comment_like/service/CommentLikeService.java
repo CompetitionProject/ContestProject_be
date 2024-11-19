@@ -1,5 +1,8 @@
 package core.contest_project.community.comment_like.service;
 
+import core.contest_project.common.error.comment.CommentErrorResult;
+import core.contest_project.common.error.comment.CommentException;
+import core.contest_project.community.comment.service.CommentReader;
 import core.contest_project.community.comment_like.CommentLikeStatus;
 import core.contest_project.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,7 @@ public class CommentLikeService {
     private final CommentLikeDeleter commentLikeDeleter;
 
     public CommentLikeStatus flip(Long commentId, UserDomain loginUSer) {
+
         if(commentLikeReader.isLiked(commentId, loginUSer.getId())){
             commentLikeDeleter.remove(commentId, loginUSer.getId());
             return CommentLikeStatus.UNLIKE;
