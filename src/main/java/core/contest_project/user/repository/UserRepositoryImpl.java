@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -58,11 +60,21 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public UserDomain findUserProfile(Long id) {
+        return null;
+    }
+
+    @Override
     public UserDomain findByNickname(String nickname) {
         User user = userJpaRepository.findByNickname(nickname)
                 .orElseThrow(() -> new IllegalArgumentException("user not found"));
 
         return user.toDomain();
+    }
+
+    @Override
+    public UserDomain findByEmail(String email) {
+        return null;
     }
 
     @Override
@@ -75,5 +87,12 @@ public class UserRepositoryImpl implements UserRepository {
     public void update(UserDomain user, UserInfo userInfo) {
         User findUser = userJpaRepository.findById(user.getId()).get();
         findUser.update(userInfo);
+    }
+
+    @Override
+    public List<UserDomain> findByUserIds(List<Long> userIds) {
+        return userJpaRepository.findByUserIds(userIds).stream()
+                .map(User::toDomain)
+                .toList();
     }
 }

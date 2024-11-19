@@ -5,6 +5,7 @@ import core.contest_project.file.FileType;
 import core.contest_project.file.FileUtil;
 import core.contest_project.file.entity.File;
 import core.contest_project.file.service.FileRequest;
+import core.contest_project.file.service.FileResponse;
 import core.contest_project.file.service.db.FileCreator;
 import core.contest_project.file.service.db.FileReader;
 import core.contest_project.file.service.db.FileUpdater;
@@ -50,16 +51,41 @@ public class PostService {
         return postId;
     }
 
+    public Long createTip(PostInfo post, List<FileRequest> requestFiles, UserDomain writer, Long contestId){
+        // FileRequest -> FileEntity
+        List<File> files = FileUtil.toEntity(requestFiles, FileLocation.POST);
+
+        // 썸네일.
+        String thumbnailUrl = getThumbnailUrl(files);
+
+        // 게시글
+        Long postId = postCreator.create(post, writer, thumbnailUrl, contestId);
+        // 파일
+        fileCreator.saveAll(postId, files);
+
+        return postId;
+    }
+
 
     public PostDomain getPost(Long postId, UserDomain loginUser) {
         PostDomain post = postReader.getPost(postId, loginUser);
-        List<File> files = fileReader.getFiles(postId, FileLocation.POST);
+        List<File> findFiles = fileReader.getFiles(postId, FileLocation.POST);
+        List<FileResponse> files = FileUtil.toResponse(findFiles);
+        post.setFiles(files);
 
         return post;
     }
 
     public Slice<PostPreviewDomain> getPopularPosts(Integer page, Integer size){
         return postReader.getPopularPosts(page, size);
+    }
+
+    public Slice<PostPreviewDomain> getPopularTips(Integer page, Long contestId){
+        return postReader.getPopularTips(page, 4, contestId);
+    }
+
+    public Slice<PostPreviewDomain> getRecentTips(Integer page, Long contestId){
+        return postReader.getRecentTips(page, 4, contestId);
     }
 
     public Page<PostPreviewDomain> getPosts(Integer page, PostSortType sort) {

@@ -2,12 +2,16 @@ package core.contest_project.common.error;
 
 import core.contest_project.common.error.awaiter.AwaiterErrorResult;
 import core.contest_project.common.error.awaiter.AwaiterException;
+import core.contest_project.common.error.comment.CommentErrorResult;
+import core.contest_project.common.error.comment.CommentException;
 import core.contest_project.common.error.contest.ContestErrorResult;
 import core.contest_project.common.error.contest.ContestException;
 import core.contest_project.common.error.file.FileErrorResult;
 import core.contest_project.common.error.file.FileException;
 import core.contest_project.common.error.team.TeamErrorResult;
 import core.contest_project.common.error.team.TeamException;
+import core.contest_project.common.error.post.PostErrorResult;
+import core.contest_project.common.error.post.PostException;
 import core.contest_project.common.error.user.UserErrorResult;
 import core.contest_project.common.error.user.UserException;
 import lombok.Getter;
@@ -89,6 +93,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(errorResult.getStatus())
                 .body(new ErrorResponse(errorResult.getStatus().value(),
                         errorResult.getMessage()));
+    }
+
+    @ExceptionHandler({PostException.class})
+    public ResponseEntity<ErrorResponse> handlePostException(final PostException exception) {
+        log.warn("PostException occur: " + exception);
+        PostErrorResult errorResult = exception.getErrorResult();
+        return ResponseEntity.status(errorResult.getStatus())
+                .body(new ErrorResponse(errorResult.getStatus().value(), errorResult.getMessage()));
+    }
+
+    @ExceptionHandler({CommentException.class})
+    public ResponseEntity<ErrorResponse> handlePostException(final CommentException exception) {
+        log.warn("PostException occur: " + exception);
+        CommentErrorResult errorResult = exception.getErrorResult();
+        return ResponseEntity.status(errorResult.getStatus())
+                .body(new ErrorResponse(errorResult.getStatus().value(), errorResult.getMessage()));
     }
 
     @RequiredArgsConstructor

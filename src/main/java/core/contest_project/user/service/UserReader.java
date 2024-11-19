@@ -1,15 +1,14 @@
 package core.contest_project.user.service;
 
-import core.contest_project.user.entity.User;
-import core.contest_project.user.repository.UserJpaRepository;
 import core.contest_project.user.service.data.UserDomain;
+import core.contest_project.user_detail.service.UserDetailInfo;
+import core.contest_project.user_detail.service.UserDetailRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Component
@@ -17,10 +16,17 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserReader {
     private final UserRepository userRepository;
-    private final UserJpaRepository userJpaRepository;
+    private final UserDetailRepository userDetailRepository;
 
     public UserDomain getUser(Long userId) {
-        return userRepository.findById(userId);
+        UserDomain user = userRepository.findById(userId);
+        UserDetailInfo userDetails = userDetailRepository.findAllByUser(user.getId());
+        user.setUserDetail(userDetails);
+        return user;
+    }
+
+    public UserDomain getUserByEmail(String email){
+        return userRepository.findByEmail(email);
     }
 
     public UserDomain getUserByCode(String code) {
@@ -31,8 +37,6 @@ public class UserReader {
             return Collections.emptyList();
         }
 
-        return userJpaRepository.findByUserIds(userIds).stream()
-                .map(User::toDomain)
-                .collect(Collectors.toList());
+        return userRepository.findByUserIds(userIds);
     }
 }

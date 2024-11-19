@@ -20,10 +20,22 @@ public class JwtTokenUtil {
     private static final Long refreshTokenExpiredTimeMs= 604800000L;
     public static final String TOKEN_TYPE="token_type";
     public static final String ACCESS_TOKEN="access_token";
+    public static final String SIGN_TOKEN="sign_token";
     public static final String REFRESH_TOKEN="refresh_token";
     public static final String USER_ID="user_id";
     public static final String IS_GUEST="is_guest";
 
+    public static String generateSignToken(){
+        Claims claims = Jwts.claims();
+        claims.put(TOKEN_TYPE, SIGN_TOKEN);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiredTimeMs))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
 
     public static String generateAccessToken(Long userId) {
         Claims claims = Jwts.claims();

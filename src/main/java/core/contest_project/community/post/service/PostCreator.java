@@ -16,4 +16,12 @@ public class PostCreator {
     public Long create(PostInfo post, UserDomain user, String thumbnailUrl){
         return postRepository.save(post, user.getId(), thumbnailUrl);
     }
+<<<<<<< HEAD
+=======
+
+    public Long create(PostInfo post, UserDomain user, String thumbnailUrl, Long contestId){
+        return postRepository.save(post, user.getId(), thumbnailUrl, contestId);
+    }
+
+>>>>>>> master
 }

@@ -69,11 +69,14 @@ public class User {
                 .role(role)
                 .userField(userField)
                 .duty(duty)
+                .isRatingPublic(isRatingPublic)
                 .build();
 
         return UserDomain.builder()
                 .id(id)
                 .userInfo(userInfo)
+                .teamMemberCode(teamMemberCode)
+                .rating(rating)
                 .build();
     }
 
@@ -114,6 +117,7 @@ public class User {
         grade=userInfo.getGrade();
         userField =userInfo.getUserField();
         duty =userInfo.getDuty();
+        updatedAt = LocalDateTime.now();
     }
 
 }

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 public interface PostRepository {
     Long save(PostInfo postInfo, Long userId, String thumbnailUrl);
+    Long save(PostInfo postInfo, Long userId, String thumbnailUrl, Long contestId);
 
     PostDomain findByPostIdJoinWriter(Long postId);
     PostUpdateDomain findByPostIdJoinWriterAndFilesForUpdate(Long postId);
@@ -17,6 +18,8 @@ public interface PostRepository {
     Slice<PostPreviewDomain> findScrapedPostsByUserId(Long userId, Pageable pageable);
     Slice<PostPreviewDomain> findPostsByUserId(Long userId, Pageable pageable);
     Slice<PostPreviewDomain> findPopularPosts(LocalDateTime onWeekAgo, Pageable pageable);
+    Slice<PostPreviewDomain> findPopularTips(LocalDateTime onWeekAgo, Pageable pageable, Long contestId);
+    Slice<PostPreviewDomain> findRecentTips(Pageable pageable, Long contestId);
     Slice<PostActivityDomain>findPostsByTeamMemberCode(String teamMemberCode, Pageable pageable);
 
     void update(Long postId, PostInfo info, String thumbnailUrl);
@@ -26,4 +29,7 @@ public interface PostRepository {
     void updateNextAnonymousSeq(Long postId);
 
     void deleteByPostId(Long postId);
+
+
+    boolean existsById(Long postId);
 }

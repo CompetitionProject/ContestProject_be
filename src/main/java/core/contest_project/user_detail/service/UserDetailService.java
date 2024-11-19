@@ -28,6 +28,9 @@ public class UserDetailService {
     public void update(UserDetailInfo detailsToUpdate, UserDomain user ){
         UserDetailInfo currentDetails = getUserDetail(user);
 
+        if(detailsToUpdate==null){
+            return;
+        }
         update(UserDetailType.CONTEST_EXPERIENCE, currentDetails.getContestExperiences(), detailsToUpdate.getContestExperiences(), user.getId());
         update(UserDetailType.AWARD, currentDetails.getAwardUrls(), detailsToUpdate.getAwardUrls(), user.getId());
         update(UserDetailType.CERTIFICATION, currentDetails.getCertificates(), detailsToUpdate.getCertificates(), user.getId());

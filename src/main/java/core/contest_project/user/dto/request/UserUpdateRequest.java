@@ -8,13 +8,13 @@ import java.util.List;
 
 public record UserUpdateRequest(
         String nickname,
-        String profileImage,
+        String snsProfileImageUrl,
 
-        String department,
+        String major,
         Grade grade,
 
-        String field,
-        String jobRole,
+        String userField,
+        String duty,
 
         boolean isRatingPublic,
 
@@ -30,10 +30,10 @@ public record UserUpdateRequest(
     public UserInfo toUserInfo(){
         return UserInfo.builder()
                 .nickname(nickname)
-                .snsProfileImageUrl(profileImage)
-                .userField(field)
-                .duty(jobRole)
-                .major(department)
+                .snsProfileImageUrl(snsProfileImageUrl)
+                .userField(userField)
+                .duty(duty)
+                .major(major)
                 .grade(grade)
                 .isRatingPublic(isRatingPublic)
                 .build();
