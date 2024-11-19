@@ -2,6 +2,7 @@ package core.contest_project.user_detail.service;
 
 import core.contest_project.user.service.data.UserDomain;
 import core.contest_project.user_detail.UserDetailType;
+import core.contest_project.user_detail.repository.UserDetailJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,10 +19,10 @@ import java.util.List;
 @Transactional
 public class UserDetailService {
     private final UserDetailRepository userDetailRepository;
+    private final UserDetailJpaRepository userDetailJpaRepository;
 
     public UserDetailInfo getUserDetail(UserDomain user) {
         return userDetailRepository.findAllByUser(user.getId());
-
     }
 
     public void update(UserDetailInfo detailsToUpdate, UserDomain user ){
@@ -51,8 +54,6 @@ public class UserDetailService {
         if(!toAdd.isEmpty()){userDetailRepository.saveAll(detailType, toAdd, userId);}
     }
 
-
-
     private List<String> getDetails(UserDetailType detailType, UserDetailInfo currentAllDetails){
 
         if(detailType==UserDetailType.AWARD){
@@ -71,4 +72,19 @@ public class UserDetailService {
         return new ArrayList<>();
     }
 
+    public List<UserDomain> setUserDetailsInBatch(List<UserDomain> users) {
+        if (users.isEmpty()) {
+            return users;
+        }
+
+        List<Long> userIds = users.stream()
+                .map(UserDomain::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, UserDetailInfo> userDetailMap = userDetailJpaRepository.findAllByUserIdsAsMap(userIds);
+
+        return users.stream()
+                .map(user -> user.withUserDetail(userDetailMap.get(user.getId())))
+                .collect(Collectors.toList());
+    }
 }

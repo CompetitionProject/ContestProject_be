@@ -1,5 +1,8 @@
 package core.contest_project.user.service;
 
+import core.contest_project.common.error.user.UserErrorResult;
+import core.contest_project.common.error.user.UserException;
+import core.contest_project.user.Role;
 import core.contest_project.user.service.data.UserDomain;
 import core.contest_project.global.exception.CustomException;
 import core.contest_project.global.exception.ErrorCode;
@@ -12,7 +15,7 @@ import java.util.Objects;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class UserValidator {
+    public class UserValidator {
 
     /**
      *
@@ -35,4 +38,9 @@ public class UserValidator {
         }
     }
 
+    public void validateAdmin(UserDomain user) {
+        if (!user.getUserInfo().getRole().equals(Role.ADMIN)) {
+            throw new UserException(UserErrorResult.UNAUTHORIZED_ADMIN_ACCESS);
+        }
+    }
 }

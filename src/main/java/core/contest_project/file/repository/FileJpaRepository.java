@@ -9,24 +9,37 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface FileJpaRepository extends JpaRepository<File,Long> {
+public interface FileJpaRepository extends JpaRepository<File, Long> {
 
     @Query("select file from File file" +
             " where file.post.id=:postId and file.location=:location")
-    List<File> findAllByPostIdAndLocation(@Param("postId")Long postId, @Param("location") FileLocation location);
+    List<File> findAllByPostIdAndLocation(@Param("postId") Long postId, @Param("location") FileLocation location);
 
     @Modifying
     @Query("delete from File file where file.post.id=:postId and file.url in :urls")
-    void deleteAllByPostId(@Param("postId")Long postId, @Param("urls")List<String> urls);
+    void deleteAllByPostId(@Param("postId") Long postId, @Param("urls") List<String> urls);
 
     @Modifying
     @Query("delete from File file where file.id in :ids")
-    void deleteAll(@Param("ids")List<Long> ids);
+    void deleteAll(@Param("ids") List<Long> ids);
 
     @Modifying
     @Query("delete from File file where file.post.id =:postId")
-    void delete(@Param("postId")Long postId);
+    void deleteByPostId(@Param("postId") Long postId);
+
+// ====== contest ======
 
 
+    @Query("select file from File file" +
+            " where file.contest.id=:contestId and file.location=:location")
+    List<File> findAllByContestIdAndLocation(@Param("contestId") Long contestId, @Param("location") FileLocation location);
+
+    @Modifying
+    @Query("delete from File file where file.contest.id=:contestId and file.url in :urls")
+    void deleteAllByContestId(@Param("contestId") Long contestId, @Param("urls") List<String> urls);
+
+    @Modifying
+    @Query("delete from File file where file.contest.id =:contestId")
+    void deleteByContestId(@Param("contestId") Long contestId);
 
 }

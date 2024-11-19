@@ -31,7 +31,6 @@ public class FileService {
             throw new FileException(FileErrorResult.FILE_UPLOAD_ERROR);
         }
     }
-
     public List<String> uploadsOnlyStorage(List<MultipartFile> files) {
         return s3Service.uploadFiles(files);
     }

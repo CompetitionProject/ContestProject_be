@@ -66,8 +66,6 @@ public class UserDetailRepositoryImpl implements UserDetailRepository {
                  .stacks(stacks)
                  .contestExperiences(contestExperiences)
                  .build();
-
-
     }
 
     @Override
@@ -82,4 +80,6 @@ public class UserDetailRepositoryImpl implements UserDetailRepository {
     public void deleteAll(Long userId) {
 
     }
+
+
 }

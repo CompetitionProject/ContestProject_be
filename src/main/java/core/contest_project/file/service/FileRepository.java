@@ -13,6 +13,8 @@ public interface FileRepository {
     List<File> findAll(Long postId, FileLocation location);
 
     void deleteAllByPostId(Long postId, List<String> storeFileNames);
-    void delete(Long postId);
+    void deleteByPostId(Long postId);
+
+    void deleteByContestId(Long contestId);
     void deleteAll(List<Long> ids);
 }

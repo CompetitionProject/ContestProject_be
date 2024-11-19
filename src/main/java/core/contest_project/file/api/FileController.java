@@ -20,7 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FileController {
     private final FileService fileService;
 
-
     @PostMapping(value="/api/files/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<FileUrlResponse> uploadFile(@RequestPart(value="file") MultipartFile file){
         String url = fileService.uploadOnlyStorage(file);
@@ -31,7 +30,5 @@ public class FileController {
     public ResponseEntity<FileUrlsResponse> uploadFiles(@RequestPart(value = "files") List<MultipartFile> files) {
         List<String> urls = fileService.uploadsOnlyStorage(files);
         return ResponseEntity.ok(FileUrlsResponse.from(urls));
-
-
     }
 }

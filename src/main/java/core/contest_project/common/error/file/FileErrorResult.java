@@ -14,13 +14,12 @@ public enum FileErrorResult {
     INVALID_FILE_NAME(HttpStatus.BAD_REQUEST, "파일 이름이 유효하지 않습니다."),
     EXCEED_MAX_CONTENT_IMAGES(HttpStatus.BAD_REQUEST, "본문 이미지는 최대 4개까지만 업로드 가능합니다."),
     EXCEED_MAX_ATTACHMENTS(HttpStatus.BAD_REQUEST, "첨부파일은 최대 2개까지만 업로드 가능합니다."),
-    POSTER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "포스터 이미지는 1개만 등록 가능합니다."),
     AWS_S3_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AWS S3 업로드 중 오류가 발생했습니다."),
     FILE_SIZE_EXCEED(HttpStatus.BAD_REQUEST, "파일 크기가 10MB를 초과할 수 없습니다."),
     EMPTY_FILE(HttpStatus.BAD_REQUEST, "파일이 비어있습니다."),
     FILE_READ_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 읽기 중 오류가 발생했습니다."),
-    INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "지원하지 않는 파일 형식입니다. (지원 형식: 이미지, PDF, Word, Excel, PowerPoint)");
-
+    INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "지원하지 않는 파일 형식입니다. (지원 형식: 이미지, PDF, Word, Excel, PowerPoint)")
+;
     private final HttpStatus status;
     private final String message;
 }

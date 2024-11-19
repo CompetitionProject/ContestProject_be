@@ -31,10 +31,8 @@ public class PostDeleter {
         commentDeleter.removeAll(postId);
 
         // 파일
-        fileDeleter.delete(postId);
+        fileDeleter.deleteByPostId(postId);
 
         postRepository.deleteByPostId(postId);
     }
-
-
 }

@@ -2,15 +2,14 @@ package core.contest_project.contest.entity;
 
 import core.contest_project.common.error.file.FileErrorResult;
 import core.contest_project.common.error.file.FileException;
+import core.contest_project.contest.dto.request.ContestCreateRequest;
+import core.contest_project.contest.dto.request.ContestUpdateRequest;
 import core.contest_project.file.FileLocation;
 import core.contest_project.file.FileType;
 import core.contest_project.file.entity.File;
 import core.contest_project.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder(toBuilder = true)
 @Entity
 public class Contest {
@@ -31,20 +30,20 @@ public class Contest {
     @Column(name = "contest_id")
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
     private String content;
 
     // 본문 이미지
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "contest")
+    @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "contest", orphanRemoval = true)
     private List<File> contentImages = new ArrayList<>();
 
-    // 포스터 이미지
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "contest")
-    private List<File> posterImage = new ArrayList<>();
-
     // 첨부 파일(지원서)
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "contest")
+    @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "contest", orphanRemoval = true)
     private List<File> attachments = new ArrayList<>();
 
     //접수일
@@ -56,10 +55,12 @@ public class Contest {
     private LocalDateTime endDate;
 
     // 조회수
+    @Builder.Default
     @Column(name = "view_count")
     private Long viewCount = 0L;
 
     // 북마크수
+    @Builder.Default
     @Column(name = "bookmark_count")
     private Long bookmarkCount = 0L;
 
@@ -94,6 +95,7 @@ public class Contest {
     private String hostUrl;
 
     // 모집글 분야
+    @Builder.Default
     @ElementCollection(targetClass = ContestField.class)
     @CollectionTable(name = "contest_fields", joinColumns = @JoinColumn(name = "contest_id"))
     @Enumerated(EnumType.STRING)
@@ -113,8 +115,15 @@ public class Contest {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-//    @OneToMany(mappedBy = "contest", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Awaiter> awaiters = new ArrayList<>(); // 대기자 목록
+    /*@OneToMany(mappedBy = "contest")
+    private List<IndividualAwaiter> individualAwaiters = new ArrayList<>();
+
+    // 실시간 대기자 수가 필요한 경우를 위한 메서드
+    public long getActiveIndividualAwaiterCount() {
+        return individualAwaiters.stream()
+                .filter(awaiter -> awaiter.isWaiting())
+                .count();
+    }*/
 
     // 모집 상태 결정
     public void updateContestStatus() {
@@ -129,32 +138,22 @@ public class Contest {
         }
     }
 
-    public static Contest createContest(String title,
-                                        String content,
-                                        LocalDateTime startDate,
-                                        LocalDateTime endDate,
-                                        String qualification,
-                                        String awardScale,
-                                        String host,
-                                        ContestApplicationMethod applicationMethod,
-                                        String applicationEmail,
-                                        String hostUrl,
-                                        List<ContestField> contestFields,
+    public static Contest createContest(ContestCreateRequest request,
                                         User writer) {
         Contest contest = Contest.builder()
-                .title(title)
-                .content(content)
-                .startDate(startDate)
-                .endDate(endDate)
+                .title(request.title())
+                .content(request.content())
+                .startDate(request.startDate())
+                .endDate(request.endDate())
                 .viewCount(0L)
                 .bookmarkCount(0L)
-                .qualification(qualification)
-                .awardScale(awardScale)
-                .host(host)
-                .applicationMethod(applicationMethod)
-                .applicationEmail(applicationEmail)
-                .hostUrl(hostUrl)
-                .contestFields(contestFields)
+                .qualification(request.qualification())
+                .awardScale(request.awardScale())
+                .host(request.host())
+                .applicationMethod(request.applicationMethod())
+                .applicationEmail(request.applicationEmail())
+                .hostUrl(request.hostUrl())
+                .contestFields(request.contestFields())
                 .writer(writer)
                 .build();
 
@@ -162,50 +161,25 @@ public class Contest {
         return contest;
     }
 
-    public void updateContest(String title,
-                              String content,
-                              LocalDateTime startDate,
-                              LocalDateTime endDate,
-                              String qualification,
-                              String awardScale,
-                              String host,
-                              ContestApplicationMethod applicationMethod,
-                              String applicationEmail,
-                              String hostUrl,
-                              List<ContestField> contestFields) {
-        // 기본 정보 업데이트
-        this.title = title;
-        this.content = content;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.qualification = qualification;
-        this.awardScale = awardScale;
-        this.host = host;
-        this.applicationMethod = applicationMethod;
-        this.applicationEmail = applicationEmail;
-        this.hostUrl = hostUrl;
-
-        // contestFields 업데이트
-        this.contestFields.clear();
-        this.contestFields.addAll(contestFields);
+    public Contest updateContest(ContestUpdateRequest request) {
+        return this.toBuilder()
+                .title(request.title())
+                .content(request.content())
+                .startDate(request.startDate())
+                .endDate(request.endDate())
+                .qualification(request.qualification())
+                .awardScale(request.awardScale())
+                .host(request.host())
+                .applicationMethod(request.applicationMethod())
+                .applicationEmail(request.applicationEmail())
+                .hostUrl(request.hostUrl())
+                .contestFields(request.contestFields())
+                .build();
     }
 
     public void withContentImages(List<File> images) {
         this.toBuilder()
                 .contentImages(images)
-                .build();
-    }
-
-    public void withPoster(List<File> posterImage) {
-        if (posterImage.size() > 1) {
-            throw new FileException(FileErrorResult.POSTER_ALREADY_EXISTS);
-        }
-        this.posterImage = posterImage;
-    }
-
-    public void withAttachments(List<File> attachments) {
-        this.toBuilder()
-                .attachments(attachments)
                 .build();
     }
 
@@ -260,14 +234,16 @@ public class Contest {
                 .collect(Collectors.toList());
     }
 
-    public List<File> getPosterImage() {
-        return posterImage.stream()
-                .filter(file -> file.getFileType() == FileType.POSTER
-                        && file.getLocation() == FileLocation.CONTEST)
-                .collect(Collectors.toList());
+    public String getPosterUrl() {
+        return this.getContentImages().stream()
+                .filter(file -> file.getFileType() == FileType.IMAGE)
+                .findFirst()
+                .map(File::getUrl)
+                .orElse(null);
     }
 
     public boolean hasPoster() {
-        return this.posterImage != null && !this.posterImage.isEmpty();
+        return this.getContentImages().stream()
+                .anyMatch(file -> file.getFileType() == FileType.IMAGE);
     }
 }

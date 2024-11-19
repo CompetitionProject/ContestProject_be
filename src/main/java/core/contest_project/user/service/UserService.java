@@ -1,5 +1,6 @@
 package core.contest_project.user.service;
 
+import core.contest_project.user.dto.response.UserProfileResponse;
 import core.contest_project.user.service.data.UserDomain;
 import core.contest_project.user.service.data.UserInfo;
 import core.contest_project.community.comment.service.CommentReader;
@@ -122,4 +123,21 @@ public class UserService {
         userDetailService.update(null, user);
 
     }
+
+    @Transactional(readOnly = true)
+    public UserDomain getUserProfile(Long userId) {
+        UserDomain userWithoutDetail = userReader.getUser(userId);
+        UserDetailInfo userDetail = userDetailService.getUserDetail(userWithoutDetail);
+
+        return userWithoutDetail.withUserDetail(userDetail);
+    }
+
+    @Transactional(readOnly = true)
+    public UserDomain getUserBriefProfileByCode(String code) {
+        UserDomain userWithoutDetail = userReader.getUserByCode(code);
+        UserDetailInfo userDetail = userDetailService.getUserDetail(userWithoutDetail);
+
+        return userWithoutDetail.withUserDetail(userDetail);
+    }
+
 }

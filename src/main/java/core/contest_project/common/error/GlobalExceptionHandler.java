@@ -1,9 +1,13 @@
 package core.contest_project.common.error;
 
+import core.contest_project.common.error.awaiter.AwaiterErrorResult;
+import core.contest_project.common.error.awaiter.AwaiterException;
 import core.contest_project.common.error.contest.ContestErrorResult;
 import core.contest_project.common.error.contest.ContestException;
 import core.contest_project.common.error.file.FileErrorResult;
 import core.contest_project.common.error.file.FileException;
+import core.contest_project.common.error.team.TeamErrorResult;
+import core.contest_project.common.error.team.TeamException;
 import core.contest_project.common.error.user.UserErrorResult;
 import core.contest_project.common.error.user.UserException;
 import lombok.Getter;
@@ -67,6 +71,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         FileErrorResult errorResult = exception.getFileErrorResult();
         return ResponseEntity.status(errorResult.getStatus())
                 .body(new ErrorResponse(errorResult.getStatus().value(), errorResult.getMessage()));
+    }
+
+    @ExceptionHandler(AwaiterException.class)
+    public ResponseEntity<ErrorResponse> handleAwaiterException(AwaiterException exception) {
+        log.warn("AwaiterException occur: " + exception);
+        AwaiterErrorResult errorResult = exception.getAwaiterErrorResult();
+        return ResponseEntity.status(errorResult.getStatus())
+                .body(new ErrorResponse(errorResult.getStatus().value(),
+                        errorResult.getMessage()));
+    }
+
+    @ExceptionHandler(TeamException.class)
+    public ResponseEntity<ErrorResponse> handleAwaiterException(TeamException exception) {
+        log.warn("AwaiterException occur: " + exception);
+        TeamErrorResult errorResult = exception.getTeamErrorResult();
+        return ResponseEntity.status(errorResult.getStatus())
+                .body(new ErrorResponse(errorResult.getStatus().value(),
+                        errorResult.getMessage()));
     }
 
     @RequiredArgsConstructor

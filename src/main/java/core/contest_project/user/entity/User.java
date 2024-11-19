@@ -82,6 +82,18 @@ public class User {
                 .id(domain.getId())
                 .nickname(domain.getUserInfo().getNickname())
                 .snsProfileImageUrl(domain.getUserInfo().getSnsProfileImageUrl())
+                .email(domain.getUserInfo().getEmail())
+                .school(domain.getUserInfo().getSchool())
+                .major(domain.getUserInfo().getMajor())
+                .grade(domain.getUserInfo().getGrade())
+                .userField(domain.getUserInfo().getUserField())
+                .duty(domain.getUserInfo().getDuty())
+                .rating(domain.getRating())
+                .isRatingPublic(domain.getUserInfo().isRatingPublic())
+                .role(domain.getUserInfo().getRole())
+                .teamMemberCode(domain.getTeamMemberCode())
+                .createdAt(domain.getCreatedAt())
+                .updatedAt(domain.getUpdatedAt())
                 .build();
     }
 

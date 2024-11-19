@@ -6,6 +6,8 @@ import core.contest_project.user.dto.request.SignUpRequest;
 import core.contest_project.user.dto.request.UserDetailRequest;
 import core.contest_project.user.dto.request.UserUpdateRequest;
 import core.contest_project.user.dto.response.MyCommentResponse;
+import core.contest_project.user.dto.response.UserBriefProfileResponse;
+import core.contest_project.user.dto.response.UserProfileResponse;
 import core.contest_project.user.service.UserService;
 import core.contest_project.user.service.data.UserDomain;
 import core.contest_project.user.service.data.UserInfo;
@@ -55,9 +57,8 @@ public class UserController {
     }
 
 
-
     @PostMapping("/api/my/withdraw/{user-id}")
-    public ResponseEntity<Void> withdraw(@PathVariable("user-id") Long userId){
+    public ResponseEntity<Void> withdraw(@PathVariable("user-id") Long userId) {
         // 임시로
         UserDomain loginUser = UserDomain.builder()
                 .id(userId)
@@ -69,7 +70,7 @@ public class UserController {
     }
 
     @GetMapping("/api/my/profile/{user-id}")
-    public ResponseEntity<UserDomain> getProfile(@PathVariable("user-id")Long userId) {
+    public ResponseEntity<UserDomain> getProfile(@PathVariable("user-id") Long userId) {
 
         // 임시로
         UserDomain loginUser = UserDomain.builder()
@@ -83,9 +84,13 @@ public class UserController {
     @GetMapping("/api/my/activity/scrap/{user-id}")
     public ResponseEntity<Slice<PostPreviewResponse>> getScrapedPosts(@PathVariable("user-id") Long userId,
                                                                       @RequestParam("page") Integer page,
-                                                                      @RequestParam(value = "sort", required = false) String sort){
-        if(sort==null){sort="createdAt";}
-        if(page==null){page=0;}
+                                                                      @RequestParam(value = "sort", required = false) String sort) {
+        if (sort == null) {
+            sort = "createdAt";
+        }
+        if (page == null) {
+            page = 0;
+        }
 
         // 임시로
         UserDomain loginUser = UserDomain.builder()
@@ -99,7 +104,7 @@ public class UserController {
 
     @GetMapping("/api/my/activity/posts/{user-id}")
     public ResponseEntity<Slice<PostPreviewResponse>> getMyPosts(@PathVariable("user-id") Long userId,
-                                                                 @RequestParam("page") Integer page){
+                                                                 @RequestParam("page") Integer page) {
         // 임시로
         UserDomain loginUser = UserDomain.builder()
                 .id(userId)
@@ -110,10 +115,12 @@ public class UserController {
     }
 
     @GetMapping("/api/my/activity/comments/{user-id}")
-    public ResponseEntity<Slice<MyCommentResponse>> getMyComments(@PathVariable("user-id")Long userId,
-                                                                  @RequestParam(value = "page", required = false) Integer page){
+    public ResponseEntity<Slice<MyCommentResponse>> getMyComments(@PathVariable("user-id") Long userId,
+                                                                  @RequestParam(value = "page", required = false) Integer page) {
 
-        if(page==null){page=0;}
+        if (page == null) {
+            page = 0;
+        }
 
         // 임시로
         UserDomain loginUser = UserDomain.builder()
@@ -125,7 +132,7 @@ public class UserController {
 
     @PutMapping("/api/my/profile/{user-id}")
     public ResponseEntity<Void> updateProfile(@RequestBody UserUpdateRequest request,
-                                              @PathVariable("user-id")Long userId){
+                                              @PathVariable("user-id") Long userId) {
 
         // 임시로
         UserDomain loginUser = UserDomain.builder()
@@ -141,4 +148,24 @@ public class UserController {
     }
 
 
+    // 사용자 프로필 조회
+    //
+    @GetMapping("/api/users/profile/{targetId}")
+    public ResponseEntity<UserProfileResponse> getUserProfile(
+            @PathVariable Long targetId
+    ) {
+        UserDomain userProfile =
+                userService.getUserProfile(targetId);
+
+        return ResponseEntity.ok(UserProfileResponse.from(userProfile));
+    }
+
+    @GetMapping("/api/users/{targetCode}")
+    public ResponseEntity<UserBriefProfileResponse> getUserByUserCode(
+            @PathVariable String targetCode
+    ) {
+
+        UserDomain userDomain = userService.getUserBriefProfileByCode(targetCode);
+        return ResponseEntity.ok(UserBriefProfileResponse.from(userDomain));
+    }
 }
