@@ -48,7 +48,6 @@ public class PostService {
         // 파일
         fileCreator.saveAll(postId, files);
 
-
         return postId;
     }
 

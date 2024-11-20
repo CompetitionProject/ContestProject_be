@@ -25,28 +25,16 @@ public record ContestSimpleResponse (
 
         List<String> postFields,
         Long userId,
-        boolean isBookmarked
+        boolean isBookmarked,
+        Long awaiterCount
 
 ){
-        public static ContestSimpleResponse from(Contest contest, boolean isBookmarked) {
-
-                Long remainingDays = ChronoUnit.DAYS.between(
-                        contest.getStartDate().toLocalDate(),
-                        contest.getEndDate().toLocalDate()
-                );
-
-                // 마감일이 지나면 -1 고정
+        public static ContestSimpleResponse from(Contest contest, boolean isBookmarked, Long awaiterCount) {
+                Long remainingDays = ChronoUnit.DAYS.between(LocalDateTime.now(), contest.getEndDate());
                 if (remainingDays < 0) {
                         remainingDays = -1L;
                 }
 
-                // posterUrl 처리
-                String posterUrl = null;
-                if (contest.getPosterImage() != null && !contest.getPosterImage().isEmpty()) {
-                        posterUrl = contest.getPosterImage().get(0).getUrl();  // 첫 번째 포스터의 URL
-                }
-
-                // contestFields를 String으로 변환
                 List<String> fields = contest.getContestFields().stream()
                         .map(ContestField::getDescription)
                         .collect(Collectors.toList());
@@ -57,10 +45,10 @@ public record ContestSimpleResponse (
                         .bookmarkCount(contest.getBookmarkCount())
                         .remainingDays(remainingDays)
                         .endDate(contest.getEndDate())
-                        .posterUrl(posterUrl)
+                        .posterUrl(contest.getPosterUrl())
                         .postFields(fields)
-                        .userId(contest.getWriter().getId())
                         .isBookmarked(isBookmarked)
+                        .awaiterCount(awaiterCount)  // 대기자 수 설정
                         .build();
         }
 }

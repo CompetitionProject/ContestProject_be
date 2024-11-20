@@ -21,7 +21,7 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @NoArgsConstructor(access=PROTECTED)
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @Getter
 public class File {

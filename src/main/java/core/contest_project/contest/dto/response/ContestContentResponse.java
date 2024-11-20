@@ -1,7 +1,7 @@
 package core.contest_project.contest.dto.response;
 
 import core.contest_project.contest.entity.Contest;
-import core.contest_project.file.dto.SingleFileResponse;
+import core.contest_project.file.entity.File;
 import lombok.Builder;
 
 import java.util.List;
@@ -11,19 +11,19 @@ import java.util.stream.Collectors;
 public record ContestContentResponse(
         Long contestId,
         String content,
-        List<SingleFileResponse> contentImageUrls,
-        List<SingleFileResponse> attachmentUrls
+        List<String> contentImageUrls,
+        List<String> attachmentUrls
 ) {
-    public static ContestContentResponse from(Contest contest) {
+    public static ContestContentResponse from(Contest contestWithImages, Contest contestWithAttachments) {
         return ContestContentResponse.builder()
-                .contestId(contest.getId())
-                .content(contest.getContent())
-                .contentImageUrls(contest.getContentImages().stream()
-                                .map(image -> new SingleFileResponse(image.getId(), image.getUrl()))
-                                .collect(Collectors.toList()))
-                .attachmentUrls(contest.getAttachments().stream()
-                                .map(attachment -> new SingleFileResponse(attachment.getId(), attachment.getUrl()))
-                                .collect(Collectors.toList()))
+                .contestId(contestWithImages.getId())
+                .content(contestWithImages.getContent())
+                .contentImageUrls(contestWithImages.getContentImages().stream()
+                        .map(File::getUrl)
+                        .collect(Collectors.toList()))
+                .attachmentUrls(contestWithAttachments.getAttachments().stream()
+                        .map(File::getUrl)
+                        .collect(Collectors.toList()))
                 .build();
     }
 }

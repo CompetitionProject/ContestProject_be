@@ -29,4 +29,16 @@ public class UserDomain {
         this.userDetail = userDetail;
     }
 
+    public UserDomain withUserDetail(UserDetailInfo userDetail) {
+        return UserDomain.builder()
+                .id(this.id)
+                .userInfo(this.userInfo)
+                .createdAt(this.createdAt)
+                .updatedAt(this.updatedAt)
+                .userDetail(userDetail)  // 새로운 userDetail
+                .teamMemberCode(this.teamMemberCode)
+                .rating(this.rating)
+                .build();
+    }
+
 }

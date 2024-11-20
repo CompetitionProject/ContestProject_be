@@ -15,8 +15,12 @@ import java.util.List;
 public class FileDeleter {
     private final FileRepository fileRepository;
 
-    public void delete(Long postId){
-        fileRepository.delete(postId);
+    public void deleteByPostId(Long postId){
+        fileRepository.deleteByPostId(postId);
+    }
+
+    public void deleteByContestId(Long contestId) {
+        fileRepository.deleteByContestId(contestId);
     }
 
 
@@ -25,8 +29,6 @@ public class FileDeleter {
         for (File file : files) {
             ids.add(file.getId());
         }
-
         fileRepository.deleteAll(ids);
     }
-    
 }

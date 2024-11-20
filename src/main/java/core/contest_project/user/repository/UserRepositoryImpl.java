@@ -1,5 +1,7 @@
 package core.contest_project.user.repository;
 
+import core.contest_project.common.error.user.UserErrorResult;
+import core.contest_project.common.error.user.UserException;
 import core.contest_project.user.Role;
 import core.contest_project.user.entity.User;
 import core.contest_project.user.service.UserRepository;
@@ -10,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,9 +34,9 @@ public class UserRepositoryImpl implements UserRepository {
                 .major(user.getMajor())
                 .grade(user.getGrade())
                 .createdAt(LocalDateTime.now())
-                .rating(0.0)
+                .rating(5.0)
                 .isRatingPublic(true)
-                .role(Role.USER)
+                .role(Role.ADMIN) // USER로 변경 해야함
                 .teamMemberCode(UUID.randomUUID().toString())
                 .popularPostNotification(false)
                 .commentOnPostNotification(false)
@@ -49,6 +52,11 @@ public class UserRepositoryImpl implements UserRepository {
 
         return userJpaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("user not found")).toDomain();
+    }
+
+    public UserDomain findByCode(String code){
+        return userJpaRepository.findByTeamMemberCode(code)
+                .orElseThrow(() -> new UserException(UserErrorResult.USER_NOT_EXIST)).toDomain();
     }
 
     @Override
@@ -79,5 +87,12 @@ public class UserRepositoryImpl implements UserRepository {
     public void update(UserDomain user, UserInfo userInfo) {
         User findUser = userJpaRepository.findById(user.getId()).get();
         findUser.update(userInfo);
+    }
+
+    @Override
+    public List<UserDomain> findByUserIds(List<Long> userIds) {
+        return userJpaRepository.findByUserIds(userIds).stream()
+                .map(User::toDomain)
+                .toList();
     }
 }

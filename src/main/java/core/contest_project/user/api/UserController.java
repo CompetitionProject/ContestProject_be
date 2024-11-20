@@ -7,6 +7,8 @@ import core.contest_project.user.dto.request.SignUpRequest;
 import core.contest_project.user.dto.request.UserDetailRequest;
 import core.contest_project.user.dto.request.UserUpdateRequest;
 import core.contest_project.user.dto.response.MyCommentResponse;
+import core.contest_project.user.dto.response.UserBriefProfileResponse;
+import core.contest_project.user.dto.response.UserProfileResponse;
 import core.contest_project.user.dto.response.UserResponse;
 import core.contest_project.user.service.UserService;
 import core.contest_project.user.service.data.UserDomain;
@@ -60,6 +62,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+
     @GetMapping("/api/my/profile")
     public ResponseEntity<UserResponse> getProfile(@AuthenticationPrincipal UserDomain loginUser) {
 
@@ -70,6 +73,7 @@ public class UserController {
 
         return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/api/my/activity/scrap")
     public ResponseEntity<Slice<PostPreviewResponse>> getScrapedPosts(
@@ -91,6 +95,7 @@ public class UserController {
 
     }
 
+
     @GetMapping("/api/my/activity/posts")
     public ResponseEntity<Slice<PostPreviewResponse>> getMyPosts(@AuthenticationPrincipal UserDomain loginUser,
                                                                  @RequestParam("page") Integer page){
@@ -98,11 +103,14 @@ public class UserController {
         return ResponseEntity.ok(postPreviewResponseSlice);
     }
 
+
     @GetMapping("/api/my/activity/comments")
     public ResponseEntity<Slice<MyCommentResponse>> getMyComments(@AuthenticationPrincipal UserDomain loginUser,
                                                                   @RequestParam(value = "page", required = false) Integer page){
 
-        if(page==null){page=0;}
+        if (page == null) {
+            page = 0;
+        }
 
         Slice<MyCommentResponse> map = userService.getMyComments(loginUser, page).map(MyCommentResponse::from);
         return ResponseEntity.ok(map);
@@ -129,4 +137,24 @@ public class UserController {
     }
 
 
+    // 사용자 프로필 조회
+    //
+    @GetMapping("/api/users/profile/{targetId}")
+    public ResponseEntity<UserProfileResponse> getUserProfile(
+            @PathVariable Long targetId
+    ) {
+        UserDomain userProfile =
+                userService.getUserProfile(targetId);
+
+        return ResponseEntity.ok(UserProfileResponse.from(userProfile));
+    }
+
+    @GetMapping("/api/users/{targetCode}")
+    public ResponseEntity<UserBriefProfileResponse> getUserByUserCode(
+            @PathVariable String targetCode
+    ) {
+
+        UserDomain userDomain = userService.getUserBriefProfileByCode(targetCode);
+        return ResponseEntity.ok(UserBriefProfileResponse.from(userDomain));
+    }
 }
