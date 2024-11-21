@@ -1,7 +1,9 @@
 package core.contest_project.global.filter;
 
 import core.contest_project.refreshtoken.common.JwtTokenUtil;
+import core.contest_project.user.Role;
 import core.contest_project.user.service.data.UserDomain;
+import core.contest_project.user.service.data.UserInfo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -22,6 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Objects;
 
+import static core.contest_project.refreshtoken.common.JwtTokenUtil.ROLE;
 import static core.contest_project.refreshtoken.common.JwtTokenUtil.USER_ID;
 
 
@@ -100,9 +103,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 }
 
                 Long userId = claims.get(USER_ID, Long.class);
+                String roleString = claims.get(ROLE, String.class);
+                Role role = Role.valueOf(roleString);
+
                 log.info("userId= {}", userId);
+
+                UserInfo info = UserInfo.builder()
+                        .role(role)
+                        .build();
+
                 UserDomain user = UserDomain.builder()
                         .id(userId)
+                        .userInfo(info)
                         .build();
 
                 saveAuthentication(user);

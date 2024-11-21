@@ -47,7 +47,7 @@ public class SecurityConfig {
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers(HttpMethod.GET, "/oauth2/authorization/kakao").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/oauth2/authorization/kakao", "/test/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/token-reissue", "/api/users/signup", "/test/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/departments", "/api/schools").permitAll()
                         .requestMatchers(SWAGGER_URIS).permitAll()
