@@ -1,10 +1,8 @@
-package core.contest_project.team_request.api;
+package core.contest_project.team_invitation.api;
 
-import core.contest_project.team_request.dto.request.TeamInvitationRequest;
-import core.contest_project.team_request.dto.response.TeamInvitationResponse;
-import core.contest_project.team_request.dto.response.TeamSentInvitationResponse;
-import core.contest_project.team_request.entity.TeamInvitationStatus;
-import core.contest_project.team_request.service.TeamAwaiterInvitationService;
+import core.contest_project.team_invitation.dto.request.TeamInvitationRequest;
+import core.contest_project.team_invitation.dto.response.TeamSentInvitationResponse;
+import core.contest_project.team_invitation.service.TeamAwaiterInvitationService;
 import core.contest_project.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;

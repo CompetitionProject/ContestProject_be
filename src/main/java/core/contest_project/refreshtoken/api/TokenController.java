@@ -10,10 +10,7 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -115,5 +112,13 @@ public class TokenController {
 
     }
 
+    @GetMapping("/test/sing-token")
+    public ResponseEntity<Map> generateSignToken(){
+        log.info("[TokenController][generateSignToken]");
 
+        String signToken = JwtTokenUtil.generateSignToken();
+        Map<String, String> response = new HashMap<>();
+        response.put(JwtTokenUtil.SIGN_TOKEN, signToken);
+        return ResponseEntity.ok(response);
+    }
 }

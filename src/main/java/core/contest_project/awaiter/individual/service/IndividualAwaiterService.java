@@ -14,7 +14,6 @@ import core.contest_project.user.dto.response.UserBriefProfileResponse;
 import core.contest_project.user.entity.User;
 import core.contest_project.user.repository.UserJpaRepository;
 import core.contest_project.user.service.UserReader;
-import core.contest_project.user.service.UserService;
 import core.contest_project.user.service.data.UserDomain;
 import core.contest_project.user_detail.service.UserDetailService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -103,20 +101,20 @@ public class IndividualAwaiterService {
                 awaiters.subList(0, pageSize) :
                 awaiters;
 
-        // 1. User ID 목록 추출
+        // User ID 목록 추출
         List<Long> userIds = content.stream()
                 .map(awaiter -> awaiter.getUser().getId())
-                .collect(Collectors.toList());
+                .toList();
 
-        // 2. User 정보 일괄 조회
+        // User 정보 일괄 조회
         List<UserDomain> users = userReader.getUsersByIds(userIds);
 
-        // 3. UserDetail 정보 일괄 조회 및 UserDomain 생성
+        // UserDetail 정보 일괄 조회 및 UserDomain 생성
         List<UserDomain> usersWithDetails = userDetailService.setUserDetailsInBatch(users);
 
         List<UserBriefProfileResponse> responses = usersWithDetails.stream()
                 .map(UserBriefProfileResponse::from)
-                .collect(Collectors.toList());
+                .toList();
 
         return new SliceImpl<>(responses, pageable, hasNext);
     }

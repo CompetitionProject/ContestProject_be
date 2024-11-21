@@ -35,7 +35,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -82,12 +81,10 @@ public class TeamService {
     }
     @Transactional(readOnly = true)
     public TeamResponse getTeamProfile(Long teamId, UserDomain currentUser) {
-
-
         Team team = teamRepository.findByIdWithLeaderAndMembers(teamId)
                 .orElseThrow(() -> new TeamException(TeamErrorResult.TEAM_NOT_FOUND));
 
-        // 팀장과 멤버들의 상세 정보 조회
+        // 팀장, 멤버 상세 정보 조회
         UserDomain leaderDomain = userService.getUserProfile(team.getLeader().getId());
         List<UserDomain> memberDomains = team.getMembers().stream()
                 .filter(member -> member.getRole() != TeamMemberRole.LEADER)
@@ -209,7 +206,6 @@ public class TeamService {
         if (!teamMemberRepository.existsById(memberId)) {
             throw new TeamException(TeamErrorResult.UNAUTHORIZED_ACTION);
         }
-
 
         Pageable pageable = PageRequest.of(0, PAGE_SIZE + 1);
         List<TeamJoinRequest> requests = teamJoinRequestRepository.findPendingRequests(

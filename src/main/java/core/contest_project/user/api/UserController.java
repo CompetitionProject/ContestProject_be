@@ -136,7 +136,6 @@ public class UserController {
 
     }
 
-
     // 사용자 프로필 조회
     //
     @GetMapping("/api/users/profile/{targetId}")

@@ -18,6 +18,7 @@ import core.contest_project.file.service.FileRequest;
 import core.contest_project.user.service.data.UserDomain;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/contests")
@@ -143,7 +145,7 @@ public class ContestController {
 //
 //    }
 
-    @PostMapping("/{contestId}/tips")
+    /*@PostMapping("/{contestId}/tips")
     public ResponseEntity<Long> createTip(@PathVariable Long contestId,
                                           @RequestBody PostRequest request,
                                           @RequestParam Long userId){
@@ -187,5 +189,7 @@ public class ContestController {
         Slice<PostPreviewResponse> tips = postService.getRecentTips(page, contestId).map(PostPreviewResponse::from);
 
         return ResponseEntity.ok(tips);
-    }
+    }*/
+
+
 }

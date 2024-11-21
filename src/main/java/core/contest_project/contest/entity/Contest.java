@@ -115,27 +115,26 @@ public class Contest {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    /*@OneToMany(mappedBy = "contest")
-    private List<IndividualAwaiter> individualAwaiters = new ArrayList<>();
+    @Column
+    private LocalDateTime lastStatusUpdate;
 
-    // 실시간 대기자 수가 필요한 경우를 위한 메서드
-    public long getActiveIndividualAwaiterCount() {
-        return individualAwaiters.stream()
-                .filter(awaiter -> awaiter.isWaiting())
-                .count();
-    }*/
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(endDate);
+    }
 
-    // 모집 상태 결정
-    public void updateContestStatus() {
+    public void updateStatus() {
         LocalDateTime now = LocalDateTime.now();
+        this.contestStatus = calculateStatus(now);
+        this.lastStatusUpdate = now;
+    }
 
+    private ContestStatus calculateStatus(LocalDateTime now) {
         if (now.isBefore(startDate)) {
-            this.contestStatus = ContestStatus.NOT_STARTED;
+            return ContestStatus.NOT_STARTED;
         } else if (now.isAfter(endDate)) {
-            this.contestStatus = ContestStatus.CLOSED;
-        } else {
-            this.contestStatus = ContestStatus.IN_PROGRESS;
+            return ContestStatus.CLOSED;
         }
+        return ContestStatus.IN_PROGRESS;
     }
 
     public static Contest createContest(ContestCreateRequest request,
@@ -157,7 +156,7 @@ public class Contest {
                 .writer(writer)
                 .build();
 
-        contest.updateContestStatus();  // 상태 설정
+        contest.updateStatus();  // 상태 설정
         return contest;
     }
 
@@ -183,26 +182,6 @@ public class Contest {
                 .build();
     }
 
-    // 마감 여부 확인
-    public boolean isExpired() {
-        return LocalDateTime.now().isAfter(endDate);
-    }
-
-    // 시작 여부 확인
-    public boolean isStarted() {
-        return LocalDateTime.now().isAfter(startDate);
-    }
-
-    // 진행 상태 업데이트
-    public void updateStatus() {
-        if (!isStarted()) {
-            this.contestStatus = ContestStatus.NOT_STARTED;
-        } else if (isExpired()) {
-            this.contestStatus = ContestStatus.CLOSED;
-        } else {
-            this.contestStatus = ContestStatus.IN_PROGRESS;
-        }
-    }
 
     // 북마크 증가/감소
     public void incrementBookmarkCount() {

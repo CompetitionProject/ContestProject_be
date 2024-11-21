@@ -15,8 +15,6 @@ import core.contest_project.team.dto.response.TeamBriefProfileResponse;
 import core.contest_project.team.entity.Team;
 import core.contest_project.team.repository.TeamRepository;
 import core.contest_project.team.service.TeamValidator;
-import core.contest_project.user.service.UserReader;
-import core.contest_project.user_detail.service.UserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,8 +35,6 @@ public class TeamAwaiterService {
     private final TeamRepository teamRepository;
     private final TeamAwaiterRepository teamAwaiterRepository;
     private final TeamValidator teamValidator;
-    private final UserReader userReader;
-    private final UserDetailService userDetailService;
 
     public TeamAwaiterId registerTeamAwaiter(Long contestId, Long teamId, Long userId) {
         Contest contest = contestRepository.findById(contestId)
@@ -114,7 +109,7 @@ public class TeamAwaiterService {
                         .name(awaiter.getTeam().getName())
                         .description(awaiter.getTeam().getDescription())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
 
         return new SliceImpl<>(responses, pageable, hasNext);
     }

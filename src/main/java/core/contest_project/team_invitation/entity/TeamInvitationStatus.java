@@ -1,4 +1,4 @@
-package core.contest_project.team_request.entity;
+package core.contest_project.team_invitation.entity;
 
 public enum TeamInvitationStatus {
     PENDING,    // 대기 중

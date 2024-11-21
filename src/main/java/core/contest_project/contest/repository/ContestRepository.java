@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,37 +51,6 @@ public interface ContestRepository extends JpaRepository<Contest, Long> {
             Pageable pageable
     );
 
-    /*@Query("SELECT DISTINCT c FROM Contest c" +
-            " LEFT JOIN c.contestFields cf" +
-            " WHERE (:fields is null or cf IN :fields)" +  // IS EMPTY 대신 is null 사용
-            " AND (:lastContestId IS NULL OR c.id < :lastContestId)" +
-            " ORDER BY c.id DESC")
-    Slice<Contest> findByContestFields(
-            @Param("fields") List<ContestField> fields,
-            @Param("lastContestId") Long lastContestId,
-            Pageable pageable
-    );*/
-
-//    @Query("SELECT NEW core.contest.contest.dto.response.ContestSimpleResponse(" +
-//            "c.id, c.title, c.bookmarkCount, " +
-//            "CASE WHEN c.endDate < CURRENT_TIMESTAMP THEN -1 " +
-//            "ELSE DATEDIFF(c.endDate, CURRENT_TIMESTAMP) END, " +
-//            "c.endDate, " +
-//            "CASE WHEN pi IS NULL THEN CAST(NULL AS string) ELSE pi.storeName END, " +
-//            "cf, " +
-//            "c.writer.id) " +
-//            "FROM Contest c " +
-//            "LEFT JOIN c.posterImage pi " +
-//            "LEFT JOIN c.contestFields cf " +
-//            "WHERE (SIZE(:fields) = 0 OR cf IN :fields) " +
-//            "AND (:lastContestId IS NULL OR c.id < :lastContestId) " +
-//            "ORDER BY c.id DESC")
-//    Slice<ContestSimpleResponse> findContestsByField(
-//            @Param("fields") List<ContestField> fields,
-//            @Param("lastContestId") Long lastContestId,
-//            Pageable pageable
-//    );
-
     // 기본 정보와 writer 조회
     @Query("SELECT c FROM Contest c " +
             "LEFT JOIN FETCH c.writer " +
@@ -98,11 +68,6 @@ public interface ContestRepository extends JpaRepository<Contest, Long> {
             "WHERE c.id = :contestId")
     Optional<Contest> findByIdWithAttachments(@Param("contestId") Long contestId);
 
-    @Modifying
-    @Query("DELETE FROM Bookmark b WHERE b.contest.id = :contestId")
-    void deleteAllBookmarks(@Param("contestId") Long contestId);
-
-    @Modifying
-    @Query("DELETE FROM File f WHERE f.contest.id = :contestId")
-    void deleteAllFiles(@Param("contestId") Long contestId);
+    @Query("SELECT c FROM Contest c WHERE c.contestStatus != 'CLOSED'")
+    List<Contest> findActiveContests();
 }

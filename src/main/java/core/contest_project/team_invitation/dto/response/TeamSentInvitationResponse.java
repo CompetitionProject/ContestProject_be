@@ -1,7 +1,7 @@
-package core.contest_project.team_request.dto.response;
+package core.contest_project.team_invitation.dto.response;
 
-import core.contest_project.team_request.entity.TeamAwaiterInvitation;
-import core.contest_project.team_request.entity.TeamInvitationStatus;
+import core.contest_project.team_invitation.entity.TeamAwaiterInvitation;
+import core.contest_project.team_invitation.entity.TeamInvitationStatus;
 import core.contest_project.user.entity.User;
 import lombok.Builder;
 

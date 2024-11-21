@@ -19,7 +19,6 @@ import core.contest_project.contest.entity.ContestSortOption;
 import core.contest_project.contest.entity.ContestStatus;
 import core.contest_project.contest.repository.ContestRepository;
 import core.contest_project.file.FileLocation;
-import core.contest_project.file.FileType;
 import core.contest_project.file.FileUtil;
 import core.contest_project.file.entity.File;
 import core.contest_project.file.service.db.FileCreator;
@@ -80,15 +79,7 @@ public class ContestService {
 
         Contest contest = findContestById(contestId);
         contestValidator.validateDateRange(request.startDate(), request.endDate());
-
-        // 이미지 1개 이상
-        boolean willHaveImage = request.files().stream()
-                .anyMatch(file -> file.type() == FileType.IMAGE);
-
-        // 현재 이미지가 없고, 새로 추가되는 이미지도 없는 경우
-        if (!contest.hasPoster() && !willHaveImage) {
-            throw new ContestException(ContestErrorResult.IMAGE_REQUIRED);
-        }
+        contestValidator.validateFiles(contest, request.files());
 
         Contest updatedContest = contest.updateContest(request);
         contestRepository.save(updatedContest);
@@ -96,6 +87,7 @@ public class ContestService {
         List<File> files = FileUtil.toEntity(request.files(), FileLocation.CONTEST);
         fileUpdater.update(contestId, FileLocation.CONTEST, files);
     }
+
 
     @Transactional
     public void deleteContest(Long contestId, UserDomain user) {
@@ -174,11 +166,7 @@ public class ContestService {
         Contest contest = findContestById(contestId);
 
         BookmarkStatus status = bookmarkService.toggleBookmark(contest, user.getId());
-        if (status.equals(BookmarkStatus.BOOKMARK)) {
-            contest.incrementBookmarkCount();
-        } else {
-            contest.decrementBookmarkCount();
-        }
+        updateBookmarkCount(status, contest);
         contestRepository.save(contest);
         return status;
     }
@@ -206,7 +194,6 @@ public class ContestService {
     public ContestContentResponse getContestContent(Long contestId) {
         Contest contestWithImages = contestRepository.findByIdWithContentImages(contestId)
                 .orElseThrow(() -> new ContestException(ContestErrorResult.CONTEST_NOT_EXIST));
-
         Contest contestWithAttachments = contestRepository.findByIdWithAttachments(contestId)
                 .orElseThrow(() -> new ContestException(ContestErrorResult.CONTEST_NOT_EXIST));
 
@@ -227,4 +214,11 @@ public class ContestService {
         });
     }
 
+    private void updateBookmarkCount(BookmarkStatus status, Contest contest) {
+        if (status.equals(BookmarkStatus.BOOKMARK)) {
+            contest.incrementBookmarkCount();
+        } else {
+            contest.decrementBookmarkCount();
+        }
+    }
 }
