@@ -1,5 +1,6 @@
 package core.contest_project.refreshtoken.common;
 
+import core.contest_project.user.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -24,6 +25,7 @@ public class JwtTokenUtil {
     public static final String REFRESH_TOKEN="refresh_token";
     public static final String USER_ID="user_id";
     public static final String IS_GUEST="is_guest";
+    public static final String ROLE = "role";
 
     public static String generateSignToken(){
         Claims claims = Jwts.claims();
@@ -37,10 +39,11 @@ public class JwtTokenUtil {
                 .compact();
     }
 
-    public static String generateAccessToken(Long userId) {
+    public static String generateAccessToken(Long userId, Role role) {
         Claims claims = Jwts.claims();
         claims.put(TOKEN_TYPE, ACCESS_TOKEN);
         claims.put(USER_ID, userId);
+        claims.put(ROLE, role);
 
         return Jwts.builder()
                 .setClaims(claims)

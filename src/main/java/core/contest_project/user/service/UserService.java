@@ -2,6 +2,7 @@ package core.contest_project.user.service;
 
 
 import core.contest_project.community.post.service.data.PostSortType;
+import core.contest_project.user.Role;
 import core.contest_project.user.service.data.UserDomain;
 import core.contest_project.user.service.data.UserInfo;
 import core.contest_project.community.comment.service.CommentReader;
@@ -65,7 +66,7 @@ public class UserService {
         Long userId = userCreator.signup(user);
 
         // 2. 토큰 발급
-        String accessToken = JwtTokenUtil.generateAccessToken(userId);
+        String accessToken = JwtTokenUtil.generateAccessToken(userId, Role.USER);
         String refreshToken = JwtTokenUtil.generateRefreshToken(userId);
 
         // 3. refresh token DB에 저장.
