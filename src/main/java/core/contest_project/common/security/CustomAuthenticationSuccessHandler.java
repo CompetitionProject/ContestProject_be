@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import core.contest_project.refreshtoken.common.JwtTokenUtil;
 import core.contest_project.refreshtoken.entity.RefreshToken;
 import core.contest_project.refreshtoken.repository.RefreshTokenJpaRepository;
+import core.contest_project.user.Role;
 import core.contest_project.user.entity.User;
 import core.contest_project.user.repository.UserJpaRepository;
 import core.contest_project.user.service.UserReader;
@@ -58,9 +59,10 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         if(user.isPresent()){
             Long userId = user.get().getId();
+            Role role = user.get().getRole();
             log.info("기존 유저");
             // ===
-            String accessToken = JwtTokenUtil.generateAccessToken(userId);
+            String accessToken = JwtTokenUtil.generateAccessToken(userId, role);
             String refreshToken = JwtTokenUtil.generateRefreshToken(userId);
             // ===
             log.info("accessToken: " + accessToken);

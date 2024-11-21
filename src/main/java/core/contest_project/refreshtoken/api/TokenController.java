@@ -3,6 +3,7 @@ package core.contest_project.refreshtoken.api;
 import core.contest_project.refreshtoken.common.JwtTokenUtil;
 import core.contest_project.refreshtoken.entity.RefreshToken;
 import core.contest_project.refreshtoken.service.RefreshTokenService;
+import core.contest_project.user.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static core.contest_project.refreshtoken.common.JwtTokenUtil.ROLE;
 import static core.contest_project.refreshtoken.common.JwtTokenUtil.USER_ID;
 
 
@@ -67,10 +69,12 @@ public class TokenController {
             log.info("토큰이 정상입니다.");
 
             Long  userId = claims.get(USER_ID, Long.class);
+            String stringRole= claims.get(ROLE, String.class);
+            Role role = Role.valueOf(stringRole);
 
-           RefreshToken findToken = refreshTokenService.findByUserIdAndRefreshToken(userId, refreshToken);
+            RefreshToken findToken = refreshTokenService.findByUserIdAndRefreshToken(userId, refreshToken);
 
-            String generatedAccessToken = JwtTokenUtil.generateAccessToken(userId);
+            String generatedAccessToken = JwtTokenUtil.generateAccessToken(userId, role);
             String generatedRefreshToken = JwtTokenUtil.generateRefreshToken(userId);
 
             findToken.updateRefreshToken(generatedRefreshToken);
@@ -102,10 +106,11 @@ public class TokenController {
 
 
     @PostMapping("/test/generate-token")
-    public ResponseEntity<Map> generateToken(@RequestParam("userId") Long userId){
+    public ResponseEntity<Map> generateToken(@RequestParam("userId") Long userId,
+                                             @RequestParam("role")Role role){
         log.info("[TokenController][generateToken]");
 
-        String accessToken = JwtTokenUtil.generateAccessToken(userId);
+        String accessToken = JwtTokenUtil.generateAccessToken(userId, role);
         Map<String, String> response = new HashMap<>();
         response.put(JwtTokenUtil.ACCESS_TOKEN, accessToken);
         return ResponseEntity.ok(response);
@@ -115,6 +120,7 @@ public class TokenController {
     @GetMapping("/test/sing-token")
     public ResponseEntity<Map> generateSignToken(){
         log.info("[TokenController][generateSignToken]");
+
 
         String signToken = JwtTokenUtil.generateSignToken();
         Map<String, String> response = new HashMap<>();
