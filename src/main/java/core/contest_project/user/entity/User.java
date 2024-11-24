@@ -54,8 +54,10 @@ public class User {
     private boolean replyOnCommentNotification;   // (추가) 대댓글
 
     @Column(nullable = false)
+    @Builder.Default
     private int warningCount = 0;
     @Enumerated(STRING)
+    @Builder.Default
     private SuspensionStatus suspensionStatus = SuspensionStatus.ACTIVE;
     private LocalDateTime suspensionEndTime;
 
