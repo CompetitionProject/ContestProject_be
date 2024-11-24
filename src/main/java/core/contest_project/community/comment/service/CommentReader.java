@@ -42,6 +42,13 @@ public class CommentReader {
 
     }
 
+    public Slice<MyCommentDomain> getCommentsByUser(UserDomain loginUser, Integer page, Long targetUserId){
+        Pageable pageable = PageRequest.of(page, 6, Sort.by(Sort.Direction.DESC, "createAt"));
+        Slice<MyCommentDomain> comments = commentRepository.findAllByUserId(targetUserId, pageable);
+        return comments;
+
+    }
+
     public Slice<CommentActivityDomain> getCommentsByTeamMemberCode(String teamMemberCode, Integer page){
         Pageable pageable=PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "createAt"));
 
