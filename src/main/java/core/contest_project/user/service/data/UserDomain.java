@@ -1,8 +1,7 @@
 package core.contest_project.user.service.data;
 
 
-import core.contest_project.user.Role;
-import core.contest_project.user.SuspensionStatus;
+import core.contest_project.moderation.SuspensionStatus;
 import core.contest_project.user_detail.service.UserDetailInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,8 +17,9 @@ public class UserDomain {
     private UserInfo userInfo;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
     private int warningCount;
-    private SuspensionStatus status;
+    private SuspensionStatus suspensionStatus;
     private LocalDateTime suspensionEndTime;
 
     private String teamMemberCode;
@@ -40,6 +40,16 @@ public class UserDomain {
                 .teamMemberCode(this.teamMemberCode)
                 .rating(this.rating)
                 .build();
+    }
+
+    public boolean isSuspended() {
+        if (suspensionStatus == SuspensionStatus.BANNED) {
+            return true;
+        }
+        if (suspensionStatus == SuspensionStatus.SUSPENDED && suspensionEndTime != null) {
+            return LocalDateTime.now().isBefore(suspensionEndTime);
+        }
+        return false;
     }
 
 }

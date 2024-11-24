@@ -20,17 +20,14 @@ public class TeamAwaiterInvitationController {
     private final TeamAwaiterInvitationService teamAwaiterInvitationService;
 
     // 초대하기
-    @PostMapping("/invitations")
+    @PostMapping("/{teamId}/contests/{contestId}/invitations")
     public ResponseEntity<Void> inviteAwaiter(
+            @PathVariable Long teamId,
+            @PathVariable Long contestId,
             @RequestBody TeamInvitationRequest request,
             @AuthenticationPrincipal UserDomain user
     ) {
-        teamAwaiterInvitationService.inviteAwaiter(
-                request.teamId(),
-                request.contestId(),
-                request.targetId(),
-                user.getId()
-        );
+        teamAwaiterInvitationService.inviteAwaiter(teamId, contestId, request.targetId(), user.getId());
         return ResponseEntity.noContent().build();
     }
 
@@ -52,7 +49,6 @@ public class TeamAwaiterInvitationController {
         return ResponseEntity.noContent().build();
     }
 
-    //controller 옮기기
     // 팀이 보낸 팀원 신청 목록 조회
     @GetMapping("/{teamId}/invitations")
     public ResponseEntity<Slice<TeamSentInvitationResponse>> getTeamSentInvitations(

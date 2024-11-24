@@ -5,10 +5,7 @@ import core.contest_project.common.error.team.TeamException;
 import core.contest_project.common.error.user.UserErrorResult;
 import core.contest_project.common.error.user.UserException;
 import core.contest_project.team.dto.request.TeamCreateRequest;
-import core.contest_project.team.dto.response.MyTeamJoinRequestResponse;
-import core.contest_project.team.dto.response.TeamBriefProfileResponse;
-import core.contest_project.team.dto.response.TeamProfileResponse;
-import core.contest_project.team.dto.response.TeamResponse;
+import core.contest_project.team.dto.response.*;
 import core.contest_project.team.entity.Team;
 import core.contest_project.team.entity.join.RequestStatus;
 import core.contest_project.team.entity.join.TeamJoinRequest;
@@ -35,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -363,6 +361,14 @@ public class TeamService {
         return new SliceImpl<>(responses, pageable, hasNext);
     }
 
+    @Transactional(readOnly = true)
+    public List<TeamSimpleResponse> getLeadingTeams(Long userId) {
+        List<Team> teams = teamRepository.findAllByLeaderId(userId);
+
+        return teams.stream()
+                .map(TeamSimpleResponse::from)
+                .collect(Collectors.toList());
+    }
 
     public Team findTeamById(Long teamId) {
         return teamRepository.findById(teamId)

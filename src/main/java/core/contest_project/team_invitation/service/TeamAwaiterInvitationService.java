@@ -142,7 +142,7 @@ public class TeamAwaiterInvitationService {
 
         List<TeamInvitationResponse> responses = content.stream()
                 .map(invitation -> TeamInvitationResponse.from(invitation, contest.getTitle()))
-                .collect(Collectors.toList());
+                .toList();
 
         return new SliceImpl<>(responses, pageable, hasNext);
     }
@@ -192,4 +192,6 @@ public class TeamAwaiterInvitationService {
 
         return new SliceImpl<>(responses, pageable, hasNext);
     }
+
+
 }

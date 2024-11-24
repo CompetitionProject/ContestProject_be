@@ -19,6 +19,8 @@ public record ContestCreateRequest(
         @NotNull(message = "이미지는 1장 이상입니다.")
         @Valid
         List<FileRequest> files,
+
+
         LocalDateTime startDate,
 
         LocalDateTime endDate,

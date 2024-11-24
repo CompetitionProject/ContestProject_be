@@ -39,4 +39,8 @@ public class UserReader {
 
         return userRepository.findByUserIds(userIds);
     }
+
+    public Long getTodaySignUpCount() {
+        return userRepository.countTodaySignUps();
+    }
 }

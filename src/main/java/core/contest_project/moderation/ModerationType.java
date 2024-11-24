@@ -1,4 +1,4 @@
-package core.contest_project.user;
+package core.contest_project.moderation;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,5 +20,14 @@ public enum ModerationType {
 
     public boolean isWarningOnly() {
         return this == WARNING;
+    }
+
+    public static ModerationType fromWarningCount(int warningCount) {
+        return switch (warningCount) {
+            case 1 -> WARNING;
+            case 2 -> SUSPENSION_24H;
+            case 3 -> SUSPENSION_7D;
+            default -> PERMANENT_BAN;
+        };
     }
 }

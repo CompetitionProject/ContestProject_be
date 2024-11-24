@@ -31,6 +31,7 @@ public class UserService {
     private final UserCreator userCreator;
     private final UserReader userReader;
     private final UserUpdater userUpdater;
+    private final UserValidator userValidator;
 
     private final PostReader postReader;
     private final CommentReader commentReader;
@@ -66,7 +67,7 @@ public class UserService {
         Long userId = userCreator.signup(user);
 
         // 2. 토큰 발급
-        String accessToken = JwtTokenUtil.generateAccessToken(userId, Role.USER);
+        String accessToken = JwtTokenUtil.generateAccessToken(userId, Role.ROLE_USER);
         String refreshToken = JwtTokenUtil.generateRefreshToken(userId);
 
         // 3. refresh token DB에 저장.
@@ -146,4 +147,8 @@ public class UserService {
         refreshTokenRepository.doBlacklist(user.getId());
     }
 
+    public Long getTodaySignUpCount(UserDomain user) {
+        userValidator.validateAdmin(user);
+        return userReader.getTodaySignUpCount();
+    }
 }

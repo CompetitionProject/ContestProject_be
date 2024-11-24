@@ -6,11 +6,9 @@ import core.contest_project.community.post.dto.request.PostRequest;
 import core.contest_project.community.post.dto.response.PostPreviewResponse;
 import core.contest_project.community.post.service.PostService;
 import core.contest_project.contest.dto.request.ContestCreateRequest;
+import core.contest_project.contest.dto.request.ContestCursor;
 import core.contest_project.contest.dto.request.ContestUpdateRequest;
-import core.contest_project.contest.dto.response.ContestApplicationInfo;
-import core.contest_project.contest.dto.response.ContestContentResponse;
-import core.contest_project.contest.dto.response.ContestResponse;
-import core.contest_project.contest.dto.response.ContestSimpleResponse;
+import core.contest_project.contest.dto.response.*;
 import core.contest_project.contest.entity.ContestField;
 import core.contest_project.contest.entity.ContestSortOption;
 import core.contest_project.contest.service.ContestService;
@@ -21,10 +19,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -35,9 +34,9 @@ public class ContestController {
 
     private final ContestService contestService;
     private final PostService postService;
-    private static final int PAGE_SIZE = 20;
 
     //공모전 생성(file X)
+//    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Long> createContest(
             @Valid @RequestBody ContestCreateRequest request,
@@ -51,6 +50,7 @@ public class ContestController {
 
     // 공모전 업데이트
     @PutMapping("/{contestId}")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> updateContest(
             @RequestBody ContestUpdateRequest request,
             @PathVariable Long contestId,
@@ -81,35 +81,22 @@ public class ContestController {
         return ResponseEntity.ok(contestContent);
     }
 
-//    // 공모전 상세 조회 (팁/후기)
-//    @GetMapping("/{contestId}/reviews")
-//    public ResponseEntity<ContestReviewsResponse> getContestReviews(
-//            @PathVariable Long contestId,
-//            @AuthenticationPrincipal UserDomain user
-//    ) {
-//        ContestReviewsResponse contestReviews = contestService.getContestReviews(contestId, user.getId());
-//        return ResponseEntity.ok(contestReviews);
-//    }
 
-
-
-    // 필드로 공모전들 조회(미선택 시 전체)
-    @GetMapping
-    public ResponseEntity<Slice<ContestSimpleResponse>> getContestsByField(
+    /*@GetMapping
+    public ResponseEntity<ContestPageResponse> getContestsByField(
             @RequestParam(required = false) List<ContestField> fields,
-            @RequestParam(required = false) Long lastContestId,
+            @RequestParam(required = false) String cursor,
             @RequestParam(required = false) ContestSortOption sortBy,
             @AuthenticationPrincipal UserDomain user
     ) {
+        ContestPageResponse response =
+                contestService.getContestsByField(fields, ContestCursor.decode(cursor), sortBy, user);
+        return ResponseEntity.ok(response);
+    }*/
 
-        List<ContestField> searchFields = (fields != null) ? fields : new ArrayList<>();
-
-        Slice<ContestSimpleResponse> contests =
-                contestService.getContestsByField(searchFields, lastContestId, PAGE_SIZE, user, sortBy);
-        return ResponseEntity.ok(contests);
-    }
 
     // 공모전 삭제
+//    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{contestId}")
     public ResponseEntity<Void> deleteContest(
             @PathVariable Long contestId,
@@ -139,21 +126,21 @@ public class ContestController {
     }
 
 
-//    //관심 분야 목록
-//    @GetMapping("/fields")
-//    public ResponseEntity<List<String>> getFields() {
-//
-//    }
+    //관심 분야 목록
+    @GetMapping("/fields")
+    public ResponseEntity<List<ContestFieldResponse>> getFields() {
+        List<ContestFieldResponse> fields = Arrays.stream(ContestField.values())
+                .map(ContestFieldResponse::from)
+                .toList();
 
-    /*@PostMapping("/{contestId}/tips")
+        return ResponseEntity.ok(fields);
+    }
+
+    @PostMapping("/{contestId}/tips")
     public ResponseEntity<Long> createTip(@PathVariable Long contestId,
                                           @RequestBody PostRequest request,
-                                          @RequestParam Long userId){
+                                          @AuthenticationPrincipal UserDomain writer){
 
-        // 임시로
-        UserDomain writer = UserDomain.builder()
-                .id(userId)
-                .build();
 
         List<FileRequest> files = request.files();
 
@@ -162,15 +149,10 @@ public class ContestController {
 
         return ResponseEntity.ok(postId);
     }
-
     @GetMapping("/{contestId}/popular-tips")
     public ResponseEntity<Slice<PostPreviewResponse>> getPopularTips(@PathVariable Long contestId,
-                                                                     @RequestParam Long userId,
                                                                      @RequestParam Integer page){
-        // 임시로
-        UserDomain writer = UserDomain.builder()
-                .id(userId)
-                .build();
+
 
         Slice<PostPreviewResponse> tips = postService.getPopularTips(page, contestId).map(PostPreviewResponse::from);
 
@@ -179,17 +161,10 @@ public class ContestController {
 
     @GetMapping("/{contestId}/recent-tips")
     public ResponseEntity<Slice<PostPreviewResponse>> getRecentTips(@PathVariable Long contestId,
-                                                                    @RequestParam Long userId,
                                                                     @RequestParam Integer page){
-        // 임시로
-        UserDomain writer = UserDomain.builder()
-                .id(userId)
-                .build();
 
         Slice<PostPreviewResponse> tips = postService.getRecentTips(page, contestId).map(PostPreviewResponse::from);
 
         return ResponseEntity.ok(tips);
-    }*/
-
-
+    }
 }

@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -156,4 +157,18 @@ public class UserController {
         UserDomain userDomain = userService.getUserBriefProfileByCode(targetCode);
         return ResponseEntity.ok(UserBriefProfileResponse.from(userDomain));
     }
+
+    /**
+     * 새로 추가 코드 구분용 - 머지 충돌 해결하면서 주석 지워주세요!
+     */
+    // 오늘의 가입자 수
+    @GetMapping("/api/users/today")
+//    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Long> getTodaySignUpCount(
+            @AuthenticationPrincipal UserDomain user
+    ) {
+        return ResponseEntity.ok(userService.getTodaySignUpCount(user));
+    }
+
+
 }

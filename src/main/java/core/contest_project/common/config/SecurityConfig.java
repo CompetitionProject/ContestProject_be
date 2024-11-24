@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -49,17 +50,17 @@ public class SecurityConfig {
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers(HttpMethod.GET, "/oauth2/authorization/kakao", "/test/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/token-reissue", "/api/users/signup", "/test/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/departments", "/api/schools").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/oauth2/authorization/kakao", "/test/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/token-reissue", "/api/users/signup", "/test/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/departments", "/api/schools").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/test/sing-token").permitAll()
-                        .requestMatchers(SWAGGER_URIS).permitAll()
+                                .requestMatchers(SWAGGER_URIS).permitAll()
 
 //                        .requestMatchers(HttpMethod.POST, "/api/contests").hasRole("ADMIN")
 //                        .requestMatchers(HttpMethod.PUT, "/api/contests/**").hasRole("ADMIN")
 //                        .requestMatchers(HttpMethod.DELETE, "/api/contests/**").hasRole("ADMIN")
 
-                        .anyRequest().authenticated()
+                                .anyRequest().authenticated()
                 )
 
                 .oauth2Login(oauth2Login -> oauth2Login

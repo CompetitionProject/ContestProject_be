@@ -50,4 +50,8 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
             Pageable pageable
     );
 
+    @Query("SELECT t FROM Team t " +
+            "WHERE t.leader.id = :userId " +
+            "ORDER BY t.createdAt DESC")
+    List<Team> findAllByLeaderId(@Param("userId") Long userId);
 }
