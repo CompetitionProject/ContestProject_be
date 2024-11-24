@@ -116,7 +116,14 @@ public class PostReader {
         Pageable pageable = PageRequest.of(page, 6, Sort.by(Sort.Direction.DESC, "createAt"));
 
         Slice<PostPreviewDomain> posts = postRepository.findPostsByUserId(loginUser.getId(), pageable);
-        //setThumbnailUrls(posts.getContent());
+
+        return posts;
+    }
+
+    public Slice<PostPreviewDomain> getPostsByUser(Integer page, UserDomain loginUser, Long targetUserId) {
+        Pageable pageable = PageRequest.of(page, 6, Sort.by(Sort.Direction.DESC, "createAt"));
+
+        Slice<PostPreviewDomain> posts = postRepository.findPostsByUserId(targetUserId, pageable);
 
         return posts;
     }
