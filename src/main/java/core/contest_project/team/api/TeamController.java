@@ -1,10 +1,7 @@
 package core.contest_project.team.api;
 
 import core.contest_project.team.dto.request.*;
-import core.contest_project.team.dto.response.MyTeamJoinRequestResponse;
-import core.contest_project.team.dto.response.TeamBriefProfileResponse;
-import core.contest_project.team.dto.response.TeamProfileResponse;
-import core.contest_project.team.dto.response.TeamResponse;
+import core.contest_project.team.dto.response.*;
 import core.contest_project.team.entity.member.TeamMemberId;
 import core.contest_project.team.service.TeamService;
 import core.contest_project.user.dto.response.UserBriefProfileResponse;
@@ -224,5 +221,13 @@ public class TeamController {
         Slice<MyTeamJoinRequestResponse> requests =
                 teamService.getMyJoinRequests(user.getId(), cursorDateTime);
         return ResponseEntity.ok(requests);
+    }
+
+    @GetMapping("/leader")
+    public ResponseEntity<List<TeamSimpleResponse>> getLeadingTeams(
+            @AuthenticationPrincipal UserDomain user
+    ) {
+        List<TeamSimpleResponse> teams = teamService.getLeadingTeams(user.getId());
+        return ResponseEntity.ok(teams);
     }
 }

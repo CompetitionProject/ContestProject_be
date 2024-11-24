@@ -2,7 +2,7 @@ package core.contest_project.user.entity;
 
 import core.contest_project.user.Grade;
 import core.contest_project.user.Role;
-import core.contest_project.user.SuspensionStatus;
+import core.contest_project.moderation.SuspensionStatus;
 import core.contest_project.user.service.data.UserDomain;
 import core.contest_project.user.service.data.UserInfo;
 import jakarta.persistence.*;
@@ -53,8 +53,10 @@ public class User {
     private boolean commentOnPostNotification;  // (추가) 댓글
     private boolean replyOnCommentNotification;   // (추가) 대댓글
 
-    private int warningCount;
-    private SuspensionStatus suspensionStatus;
+    @Column(nullable = false)
+    private int warningCount = 0;
+    @Enumerated(STRING)
+    private SuspensionStatus suspensionStatus = SuspensionStatus.ACTIVE;
     private LocalDateTime suspensionEndTime;
 
 
@@ -118,6 +120,16 @@ public class User {
         userField =userInfo.getUserField();
         duty =userInfo.getDuty();
         updatedAt = LocalDateTime.now();
+    }
+
+    public boolean isSuspended() {
+        if (suspensionStatus == SuspensionStatus.BANNED) {
+            return true;
+        }
+        if (suspensionStatus == SuspensionStatus.SUSPENDED && suspensionEndTime != null) {
+            return LocalDateTime.now().isBefore(suspensionEndTime);
+        }
+        return false;
     }
 
 }

@@ -9,7 +9,6 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Builder
 public record ContestSimpleResponse (
@@ -24,7 +23,7 @@ public record ContestSimpleResponse (
         String posterUrl,
 
         List<String> postFields,
-        Long userId,
+        Long writerId,
         boolean isBookmarked,
         Long awaiterCount
 
@@ -37,7 +36,7 @@ public record ContestSimpleResponse (
 
                 List<String> fields = contest.getContestFields().stream()
                         .map(ContestField::getDescription)
-                        .collect(Collectors.toList());
+                        .toList();
 
                 return ContestSimpleResponse.builder()
                         .contestId(contest.getId())
@@ -49,6 +48,7 @@ public record ContestSimpleResponse (
                         .postFields(fields)
                         .isBookmarked(isBookmarked)
                         .awaiterCount(awaiterCount)  // 대기자 수 설정
+                        .writerId(contest.getWriter().getId())
                         .build();
         }
 }

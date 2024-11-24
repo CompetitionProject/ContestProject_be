@@ -2,6 +2,7 @@ package core.contest_project.user.repository;
 
 import core.contest_project.common.error.user.UserErrorResult;
 import core.contest_project.common.error.user.UserException;
+import core.contest_project.moderation.SuspensionStatus;
 import core.contest_project.user.Role;
 import core.contest_project.user.entity.User;
 import core.contest_project.user.service.UserRepository;
@@ -36,7 +37,7 @@ public class UserRepositoryImpl implements UserRepository {
                 .createdAt(LocalDateTime.now())
                 .rating(5.0)
                 .isRatingPublic(true)
-                .role(Role.ADMIN) // USER로 변경 해야함
+                .role(Role.ROLE_ADMIN) // USER로 변경 해야함
                 .teamMemberCode(UUID.randomUUID().toString())
                 .popularPostNotification(false)
                 .commentOnPostNotification(false)
@@ -94,5 +95,15 @@ public class UserRepositoryImpl implements UserRepository {
         return userJpaRepository.findByUserIds(userIds).stream()
                 .map(User::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Long countTodaySignUps() {
+        return userJpaRepository.countTodaySignUps();
+    }
+
+    @Override
+    public void updateSuspensionStatus(Long userId, SuspensionStatus status, LocalDateTime endTime, int warningCount) {
+        userJpaRepository.updateSuspensionStatus(userId, status, endTime, warningCount);
     }
 }

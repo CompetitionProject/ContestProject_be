@@ -86,6 +86,7 @@ public class PostReader {
         return postRepository.findRecentTips(pageable, contestId);
     }
 
+
     public Slice<PostActivityDomain> getPostsByTeamMemberCode(String teamMemberCode, Integer page){
         Pageable pageable=PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, PostSortType.DATE.getFieldName()));
 

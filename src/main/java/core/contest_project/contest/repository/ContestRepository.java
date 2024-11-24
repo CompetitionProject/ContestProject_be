@@ -1,5 +1,6 @@
 package core.contest_project.contest.repository;
 
+import core.contest_project.contest.dto.request.ContestCursor;
 import core.contest_project.contest.entity.Contest;
 import core.contest_project.contest.entity.ContestField;
 import core.contest_project.contest.entity.ContestStatus;
@@ -12,6 +13,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,65 +23,64 @@ public interface ContestRepository extends JpaRepository<Contest, Long> {
     @Query("UPDATE Contest c SET c.viewCount = c.viewCount + 1 WHERE c.id = :id")
     void incrementViewCount(@Param("id") Long contestId);
 
-    @Query("SELECT c, " +
-            "(SELECT COUNT(a) FROM IndividualAwaiter a WHERE a.contest = c AND a.status = 'WAITING') as awaiterCount " +
-            "FROM Contest c " +
-            "LEFT JOIN c.contestFields cf " +
-            "WHERE (:fields is null or cf IN :fields) " +
-            "AND (:lastContestId IS NULL OR c.id < :lastContestId) " +
-            "AND c.contestStatus IN :activeStatuses " +
-            "GROUP BY c " +
-            "ORDER BY " +
-            "CASE " +
-            "   WHEN :sortBy = 'LATEST' THEN c.id " +
-            "   WHEN :sortBy = 'MOST_BOOKMARKS' THEN c.bookmarkCount " +
-            "   WHEN :sortBy = 'CLOSEST_DEADLINE' THEN " +
-            "     CASE " +
-            "       WHEN c.endDate < CURRENT_TIMESTAMP THEN '9999-12-31' " +
-            "       ELSE c.endDate " +
-            "     END " +
-            "   WHEN :sortBy = 'MOST_AWAITERS' THEN " +
-            "     (SELECT COUNT(a) FROM IndividualAwaiter a WHERE a.contest = c AND a.status = 'WAITING')" +
-            "END DESC, " +
-            "c.id DESC")
-    Slice<Object[]> findByContestFields(
+    /*@Query("""
+    SELECT c,
+        COUNT(DISTINCT a) as awaiterCount,
+        COUNT(DISTINCT p) as reviewCount
+    FROM Contest c
+    LEFT JOIN IndividualAwaiter a ON a.contest = c AND a.status = 'WAITING'
+    LEFT JOIN Post p ON p.contest = c
+    LEFT JOIN c.contestFields cf
+    WHERE (:fields IS NULL OR cf IN :fields)
+    AND c.contestStatus IN :activeStatuses
+    AND (:cursor IS NULL OR (
+        CASE
+            WHEN :sort = 'LATEST' THEN
+                (c.createdAt < :cursorDateTime OR (c.createdAt = :cursorDateTime AND c.id < :cursorId))
+
+            WHEN :sort = 'MOST_BOOKMARKS' THEN
+                (c.bookmarkCount < :cursorBookmarkCount OR (c.bookmarkCount = :cursorBookmarkCount AND c.id < :cursorId))
+
+            WHEN :sort = 'CLOSEST_DEADLINE' THEN
+                ((c.endDate >= CURRENT_TIMESTAMP AND c.endDate > :cursorEndDate)
+                    OR (c.endDate = :cursorEndDate AND c.id < :cursorId))
+
+            WHEN :sort = 'MOST_AWAITERS' THEN
+                (COUNT(DISTINCT a) < :cursorAwaiterCount
+                    OR (COUNT(DISTINCT a) = :cursorAwaiterCount AND c.id < :cursorId))
+
+            WHEN :sort = 'MOST_REVIEWS' THEN
+                (COUNT(DISTINCT p) < :cursorReviewCount
+                    OR (COUNT(DISTINCT p) = :cursorReviewCount AND c.id < :cursorId))
+            ELSE true
+        END
+    ))
+    GROUP BY c
+    ORDER BY
+    CASE
+        WHEN :sort = 'LATEST' THEN c.createdAt
+        WHEN :sort = 'MOST_BOOKMARKS' THEN c.bookmarkCount
+        WHEN :sort = 'CLOSEST_DEADLINE' AND c.endDate >= CURRENT_TIMESTAMP THEN 1
+        WHEN :sort = 'CLOSEST_DEADLINE' THEN 2
+        WHEN :sort = 'MOST_AWAITERS' THEN COUNT(DISTINCT a)
+        WHEN :sort = 'MOST_REVIEWS' THEN COUNT(DISTINCT p)
+    END DESC,
+    CASE WHEN :sort = 'CLOSEST_DEADLINE' AND c.endDate >= CURRENT_TIMESTAMP THEN c.endDate END ASC,
+    c.id DESC
+    """)
+    List<Contest> findByContestFields(
             @Param("fields") List<ContestField> fields,
-            @Param("lastContestId") Long lastContestId,
-            @Param("sortBy") String sortBy,
+            @Param("cursor") ContestCursor cursor,
+            @Param("cursorId") Long cursorId,
+            @Param("cursorDateTime") LocalDateTime cursorDateTime,
+            @Param("cursorBookmarkCount") Long cursorBookmarkCount,
+            @Param("cursorEndDate") LocalDateTime cursorEndDate,
+            @Param("cursorAwaiterCount") Long cursorAwaiterCount,
+            @Param("cursorReviewCount") Long cursorReviewCount,
+            @Param("sort") String sort,
             @Param("activeStatuses") List<ContestStatus> activeStatuses,
             Pageable pageable
-    );
-
-    /*@Query("SELECT DISTINCT c FROM Contest c" +
-            " LEFT JOIN c.contestFields cf" +
-            " WHERE (:fields is null or cf IN :fields)" +  // IS EMPTY 대신 is null 사용
-            " AND (:lastContestId IS NULL OR c.id < :lastContestId)" +
-            " ORDER BY c.id DESC")
-    Slice<Contest> findByContestFields(
-            @Param("fields") List<ContestField> fields,
-            @Param("lastContestId") Long lastContestId,
-            Pageable pageable
     );*/
-
-//    @Query("SELECT NEW core.contest.contest.dto.response.ContestSimpleResponse(" +
-//            "c.id, c.title, c.bookmarkCount, " +
-//            "CASE WHEN c.endDate < CURRENT_TIMESTAMP THEN -1 " +
-//            "ELSE DATEDIFF(c.endDate, CURRENT_TIMESTAMP) END, " +
-//            "c.endDate, " +
-//            "CASE WHEN pi IS NULL THEN CAST(NULL AS string) ELSE pi.storeName END, " +
-//            "cf, " +
-//            "c.writer.id) " +
-//            "FROM Contest c " +
-//            "LEFT JOIN c.posterImage pi " +
-//            "LEFT JOIN c.contestFields cf " +
-//            "WHERE (SIZE(:fields) = 0 OR cf IN :fields) " +
-//            "AND (:lastContestId IS NULL OR c.id < :lastContestId) " +
-//            "ORDER BY c.id DESC")
-//    Slice<ContestSimpleResponse> findContestsByField(
-//            @Param("fields") List<ContestField> fields,
-//            @Param("lastContestId") Long lastContestId,
-//            Pageable pageable
-//    );
 
     // 기본 정보와 writer 조회
     @Query("SELECT c FROM Contest c " +
@@ -98,11 +99,6 @@ public interface ContestRepository extends JpaRepository<Contest, Long> {
             "WHERE c.id = :contestId")
     Optional<Contest> findByIdWithAttachments(@Param("contestId") Long contestId);
 
-    @Modifying
-    @Query("DELETE FROM Bookmark b WHERE b.contest.id = :contestId")
-    void deleteAllBookmarks(@Param("contestId") Long contestId);
-
-    @Modifying
-    @Query("DELETE FROM File f WHERE f.contest.id = :contestId")
-    void deleteAllFiles(@Param("contestId") Long contestId);
+    @Query("SELECT c FROM Contest c WHERE c.contestStatus != 'CLOSED'")
+    List<Contest> findActiveContests();
 }

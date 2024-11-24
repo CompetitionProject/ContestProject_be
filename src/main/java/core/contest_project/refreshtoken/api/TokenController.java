@@ -121,11 +121,10 @@ public class TokenController {
     public ResponseEntity<Map> generateSignToken(){
         log.info("[TokenController][generateSignToken]");
 
+
         String signToken = JwtTokenUtil.generateSignToken();
         Map<String, String> response = new HashMap<>();
         response.put(JwtTokenUtil.SIGN_TOKEN, signToken);
         return ResponseEntity.ok(response);
     }
-
-
 }

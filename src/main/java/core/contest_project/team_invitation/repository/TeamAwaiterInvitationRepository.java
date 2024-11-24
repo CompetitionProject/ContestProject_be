@@ -1,8 +1,7 @@
-package core.contest_project.team_request.repository;
+package core.contest_project.team_invitation.repository;
 
-import core.contest_project.team_request.entity.TeamAwaiterInvitation;
-import core.contest_project.team_request.entity.TeamAwaiterInvitationId;
-import core.contest_project.team_request.entity.TeamInvitationStatus;
+import core.contest_project.team_invitation.entity.TeamAwaiterInvitation;
+import core.contest_project.team_invitation.entity.TeamAwaiterInvitationId;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

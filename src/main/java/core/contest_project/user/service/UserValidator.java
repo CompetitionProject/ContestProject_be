@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Component
@@ -39,8 +40,18 @@ import java.util.Objects;
     }
 
     public void validateAdmin(UserDomain user) {
-        if (!user.getUserInfo().getRole().equals(Role.ADMIN)) {
+        if (!user.getUserInfo().getRole().equals(Role.ROLE_ADMIN)) {
             throw new UserException(UserErrorResult.UNAUTHORIZED_ADMIN_ACCESS);
         }
     }
+
+    /*public void validateUserActive(UserDomain user) {
+        if (user.isSuspended()) {
+            LocalDateTime endTime = user.getSuspensionEndTime();
+            String message = endTime != null ?
+                    String.format("계정이 %s까지 정지되었습니다.", endTime) :
+                    "계정이 영구 정지되었습니다.";
+            throw new UserException(UserErrorResult.USER_SUSPENDED, message);
+        }
+    }*/
 }

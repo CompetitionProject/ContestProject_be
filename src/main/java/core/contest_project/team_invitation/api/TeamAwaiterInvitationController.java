@@ -1,10 +1,8 @@
-package core.contest_project.team_request.api;
+package core.contest_project.team_invitation.api;
 
-import core.contest_project.team_request.dto.request.TeamInvitationRequest;
-import core.contest_project.team_request.dto.response.TeamInvitationResponse;
-import core.contest_project.team_request.dto.response.TeamSentInvitationResponse;
-import core.contest_project.team_request.entity.TeamInvitationStatus;
-import core.contest_project.team_request.service.TeamAwaiterInvitationService;
+import core.contest_project.team_invitation.dto.request.TeamInvitationRequest;
+import core.contest_project.team_invitation.dto.response.TeamSentInvitationResponse;
+import core.contest_project.team_invitation.service.TeamAwaiterInvitationService;
 import core.contest_project.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
@@ -22,17 +20,14 @@ public class TeamAwaiterInvitationController {
     private final TeamAwaiterInvitationService teamAwaiterInvitationService;
 
     // 초대하기
-    @PostMapping("/invitations")
+    @PostMapping("/{teamId}/contests/{contestId}/invitations")
     public ResponseEntity<Void> inviteAwaiter(
+            @PathVariable Long teamId,
+            @PathVariable Long contestId,
             @RequestBody TeamInvitationRequest request,
             @AuthenticationPrincipal UserDomain user
     ) {
-        teamAwaiterInvitationService.inviteAwaiter(
-                request.teamId(),
-                request.contestId(),
-                request.targetId(),
-                user.getId()
-        );
+        teamAwaiterInvitationService.inviteAwaiter(teamId, contestId, request.targetId(), user.getId());
         return ResponseEntity.noContent().build();
     }
 
@@ -54,7 +49,6 @@ public class TeamAwaiterInvitationController {
         return ResponseEntity.noContent().build();
     }
 
-    //controller 옮기기
     // 팀이 보낸 팀원 신청 목록 조회
     @GetMapping("/{teamId}/invitations")
     public ResponseEntity<Slice<TeamSentInvitationResponse>> getTeamSentInvitations(

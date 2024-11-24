@@ -12,15 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
-/**
- * 팀 대기자 등록
- * 팀 대기자 취소
- * 팀 대기자 목록 조회
- * 팀 프로필 조회 -- teamController
- * 팀 멤버 프로필 조회 -- teamController
- *
- */
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/contests/{contestId}/awaiters/team")

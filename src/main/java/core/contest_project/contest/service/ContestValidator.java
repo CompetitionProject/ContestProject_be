@@ -4,6 +4,7 @@ import core.contest_project.common.error.contest.ContestErrorResult;
 import core.contest_project.common.error.contest.ContestException;
 import core.contest_project.common.error.file.FileErrorResult;
 import core.contest_project.common.error.file.FileException;
+import core.contest_project.contest.entity.Contest;
 import core.contest_project.file.FileType;
 import core.contest_project.file.service.FileRequest;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,15 @@ public class ContestValidator {
                 .count();
         if (attachmentCount > MAX_ATTACHMENTS) {
             throw new FileException(FileErrorResult.EXCEED_MAX_ATTACHMENTS);
+        }
+    }
+
+    public void validateFiles(Contest contest, List<FileRequest> requestFiles) {
+        boolean willHaveImage = requestFiles.stream()
+                .anyMatch(file -> file.type() == FileType.IMAGE);
+
+        if (!contest.hasPoster() && !willHaveImage) {
+            throw new ContestException(ContestErrorResult.IMAGE_REQUIRED);
         }
     }
 }

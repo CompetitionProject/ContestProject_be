@@ -103,6 +103,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 }
 
                 Long userId = claims.get(USER_ID, Long.class);
+
                 String roleString = claims.get(ROLE, String.class);
                 Role role = Role.valueOf(roleString);
 

@@ -3,7 +3,6 @@ package core.contest_project.awaiter.individual.api;
 import core.contest_project.awaiter.individual.entity.IndividualAwaiterId;
 import core.contest_project.awaiter.individual.service.IndividualAwaiterService;
 import core.contest_project.user.dto.response.UserBriefProfileResponse;
-import core.contest_project.user.dto.response.UserProfileResponse;
 import core.contest_project.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
@@ -13,13 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
-/**
- * 개인 대기자 등록 - O
- * 개인 대기자 취소 - O
- * 개인 대기자 목록 조회 - A(UserDetail을 가져오지 못함)
- * 개인 대기자 프로필 조회 -- UserController
- *
- */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/contests/{contestId}/awaiters/individual")
@@ -47,7 +39,6 @@ public class IndividualAwaiterController {
             @AuthenticationPrincipal UserDomain user
     ) {
         individualAwaiterService.cancelIndividualAwaiter(contestId, user.getId());
-
         return ResponseEntity.noContent().build();
     }
 

@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,6 +22,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     private final JwtTokenFilter jwtTokenFilter;
@@ -47,12 +50,19 @@ public class SecurityConfig {
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers(HttpMethod.GET, "/oauth2/authorization/kakao", "/test/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/token-reissue", "/api/users/signup", "/test/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/departments", "/api/schools").permitAll()
-                        .requestMatchers(SWAGGER_URIS).permitAll()
-                        .anyRequest().authenticated()
+                                .requestMatchers(HttpMethod.GET, "/oauth2/authorization/kakao", "/test/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/token-reissue", "/api/users/signup", "/test/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/departments", "/api/schools").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/test/sing-token").permitAll()
+                                .requestMatchers(SWAGGER_URIS).permitAll()
+
+//                        .requestMatchers(HttpMethod.POST, "/api/contests").hasRole("ADMIN")
+//                        .requestMatchers(HttpMethod.PUT, "/api/contests/**").hasRole("ADMIN")
+//                        .requestMatchers(HttpMethod.DELETE, "/api/contests/**").hasRole("ADMIN")
+
+                                .anyRequest().authenticated()
                 )
+
                 .oauth2Login(oauth2Login -> oauth2Login
                         .successHandler(customAuthenticationSuccessHandler)
 

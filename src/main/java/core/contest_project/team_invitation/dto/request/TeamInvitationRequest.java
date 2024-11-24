@@ -1,4 +1,4 @@
-package core.contest_project.team_request.dto.request;
+package core.contest_project.team_invitation.dto.request;
 
 public record TeamInvitationRequest(
         Long teamId,

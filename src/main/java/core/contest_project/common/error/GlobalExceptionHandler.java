@@ -117,4 +117,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         private final int code;
         private final String message;
     }
+
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<ErrorResponse> handlePostException(final Exception exception) {
+        log.warn("PostException occur: " + exception);
+        exception.printStackTrace();
+        return null;
+    }
 }

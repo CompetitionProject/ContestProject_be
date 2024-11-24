@@ -1,4 +1,4 @@
-package core.contest_project.team_request.service;
+package core.contest_project.team_invitation.service;
 
 import core.contest_project.awaiter.individual.entity.IndividualAwaiter;
 import core.contest_project.awaiter.individual.entity.IndividualAwaiterId;
@@ -18,12 +18,11 @@ import core.contest_project.team.entity.member.TeamMemberRole;
 import core.contest_project.team.repository.TeamMemberRepository;
 import core.contest_project.team.repository.TeamRepository;
 import core.contest_project.team.service.TeamValidator;
-import core.contest_project.team_request.dto.response.TeamInvitationResponse;
-import core.contest_project.team_request.dto.response.TeamSentInvitationResponse;
-import core.contest_project.team_request.entity.TeamAwaiterInvitation;
-import core.contest_project.team_request.entity.TeamAwaiterInvitationId;
-import core.contest_project.team_request.repository.TeamAwaiterInvitationRepository;
-import core.contest_project.user.entity.User;
+import core.contest_project.team_invitation.dto.response.TeamInvitationResponse;
+import core.contest_project.team_invitation.dto.response.TeamSentInvitationResponse;
+import core.contest_project.team_invitation.entity.TeamAwaiterInvitation;
+import core.contest_project.team_invitation.entity.TeamAwaiterInvitationId;
+import core.contest_project.team_invitation.repository.TeamAwaiterInvitationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -143,7 +142,7 @@ public class TeamAwaiterInvitationService {
 
         List<TeamInvitationResponse> responses = content.stream()
                 .map(invitation -> TeamInvitationResponse.from(invitation, contest.getTitle()))
-                .collect(Collectors.toList());
+                .toList();
 
         return new SliceImpl<>(responses, pageable, hasNext);
     }
@@ -193,4 +192,6 @@ public class TeamAwaiterInvitationService {
 
         return new SliceImpl<>(responses, pageable, hasNext);
     }
+
+
 }

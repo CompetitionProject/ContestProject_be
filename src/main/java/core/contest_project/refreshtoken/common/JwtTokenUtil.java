@@ -43,7 +43,7 @@ public class JwtTokenUtil {
         Claims claims = Jwts.claims();
         claims.put(TOKEN_TYPE, ACCESS_TOKEN);
         claims.put(USER_ID, userId);
-        claims.put(ROLE, role);
+        claims.put(ROLE, role.getRole());
 
         return Jwts.builder()
                 .setClaims(claims)

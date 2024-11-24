@@ -1,4 +1,4 @@
-package core.contest_project.team_request.entity;
+package core.contest_project.team_invitation.entity;
 
 import core.contest_project.common.error.team.TeamErrorResult;
 import core.contest_project.common.error.team.TeamException;

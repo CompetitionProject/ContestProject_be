@@ -8,18 +8,15 @@ import core.contest_project.bookmark.service.BookmarkService;
 import core.contest_project.common.error.contest.ContestErrorResult;
 import core.contest_project.common.error.contest.ContestException;
 import core.contest_project.contest.dto.request.ContestCreateRequest;
+import core.contest_project.contest.dto.request.ContestCursor;
 import core.contest_project.contest.dto.request.ContestUpdateRequest;
-import core.contest_project.contest.dto.response.ContestApplicationInfo;
-import core.contest_project.contest.dto.response.ContestContentResponse;
-import core.contest_project.contest.dto.response.ContestResponse;
-import core.contest_project.contest.dto.response.ContestSimpleResponse;
+import core.contest_project.contest.dto.response.*;
 import core.contest_project.contest.entity.Contest;
 import core.contest_project.contest.entity.ContestField;
 import core.contest_project.contest.entity.ContestSortOption;
 import core.contest_project.contest.entity.ContestStatus;
 import core.contest_project.contest.repository.ContestRepository;
 import core.contest_project.file.FileLocation;
-import core.contest_project.file.FileType;
 import core.contest_project.file.FileUtil;
 import core.contest_project.file.entity.File;
 import core.contest_project.file.service.db.FileCreator;
@@ -30,17 +27,13 @@ import core.contest_project.user.service.UserValidator;
 import core.contest_project.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -58,6 +51,9 @@ public class ContestService {
     private final ContestValidator contestValidator;
     private final IndividualAwaiterRepository individualAwaiterRepository;
     private final TeamAwaiterRepository teamAwaiterRepository;
+
+    private static final int PAGE_SIZE = 20;
+
 
     @Transactional
     public Long createContest(ContestCreateRequest request, UserDomain user) {
@@ -80,15 +76,7 @@ public class ContestService {
 
         Contest contest = findContestById(contestId);
         contestValidator.validateDateRange(request.startDate(), request.endDate());
-
-        // 이미지 1개 이상
-        boolean willHaveImage = request.files().stream()
-                .anyMatch(file -> file.type() == FileType.IMAGE);
-
-        // 현재 이미지가 없고, 새로 추가되는 이미지도 없는 경우
-        if (!contest.hasPoster() && !willHaveImage) {
-            throw new ContestException(ContestErrorResult.IMAGE_REQUIRED);
-        }
+        contestValidator.validateFiles(contest, request.files());
 
         Contest updatedContest = contest.updateContest(request);
         contestRepository.save(updatedContest);
@@ -96,6 +84,7 @@ public class ContestService {
         List<File> files = FileUtil.toEntity(request.files(), FileLocation.CONTEST);
         fileUpdater.update(contestId, FileLocation.CONTEST, files);
     }
+
 
     @Transactional
     public void deleteContest(Long contestId, UserDomain user) {
@@ -110,46 +99,79 @@ public class ContestService {
         contestRepository.delete(contest);
     }
 
-    @Transactional(readOnly = true)
-    public Slice<ContestSimpleResponse> getContestsByField(
+    /*@Transactional(readOnly = true)
+    public ContestPageResponse getContestsByField(
             List<ContestField> fields,
-            Long lastContestId,
-            int pageSize,
-            UserDomain user,
-            ContestSortOption sortOption
+            ContestCursor cursor,
+            ContestSortOption sortOption,
+            UserDomain user
     ) {
         // 검색 필드
         List<ContestField> searchFields = (fields != null && !fields.isEmpty()) ? fields : null;
         // 정렬
         ContestSortOption finalSortOption = (sortOption != null) ? sortOption : ContestSortOption.LATEST;
-        // 활성 상태(모집 중) 공모전만 조회하도록 상태 리스트 생성
+        // 활성 상태(모집 중) 공모전만 조회
         List<ContestStatus> activeStatuses = Arrays.asList(ContestStatus.NOT_STARTED, ContestStatus.IN_PROGRESS);
 
-        Pageable pageable = PageRequest.of(0, pageSize + 1);
+        // 커서 값 추출
+        Long cursorId = cursor != null ? cursor.contestId() : null;
+        LocalDateTime cursorDateTime = null;
+        Long cursorBookmarkCount = null;
+        LocalDateTime cursorEndDate = null;
+        Long cursorAwaiterCount = null;
+        Long cursorReviewCount = null;
 
-        Slice<Object[]> results = contestRepository.findByContestFields(
+        if (cursor != null) {
+            if (cursor.sortValue() instanceof ContestCursor.SortValue.Latest latest) {
+                cursorDateTime = latest.createdAt();
+            } else if (cursor.sortValue() instanceof ContestCursor.SortValue.Bookmarks bookmarks) {
+                cursorBookmarkCount = bookmarks.count();
+            } else if (cursor.sortValue() instanceof ContestCursor.SortValue.Deadline deadline) {
+                cursorEndDate = deadline.endDate();
+            } else if (cursor.sortValue() instanceof ContestCursor.SortValue.Awaiters awaiters) {
+                cursorAwaiterCount = awaiters.count();
+            } else if (cursor.sortValue() instanceof ContestCursor.SortValue.Reviews reviews) {
+                cursorReviewCount = reviews.count();
+            }
+        }
+
+        // 페이지 요청 생성 (size + 1로 다음 페이지 존재 여부 확인)
+        PageRequest pageRequest = PageRequest.of(0, PAGE_SIZE + 1);
+
+        // 데이터 조회
+        List<Object[]> results = contestRepository.findByContestFields(
                 searchFields,
-                lastContestId,
+                cursor,
+                cursorId,
+                cursorDateTime,
+                cursorBookmarkCount,
+                cursorEndDate,
+                cursorAwaiterCount,
+                cursorReviewCount,
                 finalSortOption.name(),
                 activeStatuses,
-                pageable
+                pageRequest
         );
 
-        boolean hasNext = results.getContent().size() > pageSize;
+        // 다음 페이지 존재 여부 확인
+        boolean hasNext = results.size() > PAGE_SIZE;
         List<Object[]> content = hasNext ?
-                results.getContent().subList(0, pageSize) :
-                results.getContent();
+                results.subList(0, PAGE_SIZE) :
+                results;
 
-        // Contest 목록과 대기자 수
-        List<Contest> contests = content.stream()
-                .map(result -> (Contest) result[0])
-                .toList();
+        // Contest 목록과 부가 정보 매핑
+        List<Contest> contests = new ArrayList<>();
+        Map<Long, Long> awaiterCountMap = new HashMap<>();
+        Map<Long, Long> reviewCountMap = new HashMap<>();
 
-        Map<Long, Long> awaiterCountMap = content.stream()
-                .collect(Collectors.toMap(
-                        result -> ((Contest) result[0]).getId(),
-                        result -> (Long) result[1]
-                ));
+        for (Object[] result : content) {
+            Contest contest = (Contest) result[0];
+            Long awaiterCount = (Long) result[1];
+            Long reviewCount = (Long) result[2];
+            contests.add(contest);
+            awaiterCountMap.put(contest.getId(), awaiterCount);
+            reviewCountMap.put(contest.getId(), reviewCount);
+        }
 
         // 북마크 정보 조회
         List<Long> contestIds = contests.stream()
@@ -157,7 +179,7 @@ public class ContestService {
                 .toList();
         List<Long> bookmarkedContestIds = bookmarkRepository.findBookmarkedContestIds(contestIds, user.getId());
 
-        // 응답 생성
+        // 응답 데이터 생성
         List<ContestSimpleResponse> responses = contests.stream()
                 .map(contest -> {
                     boolean isBookmarked = bookmarkedContestIds.contains(contest.getId());
@@ -166,19 +188,28 @@ public class ContestService {
                 })
                 .toList();
 
-        return new SliceImpl<>(responses, pageable, hasNext);
-    }
+        // 다음 커서 생성
+        String nextCursor = null;
+        if (hasNext && !contests.isEmpty()) {
+            Contest lastContest = contests.get(contests.size() - 1);
+            ContestCursor nextContestCursor = ContestCursor.create(
+                    lastContest,
+                    finalSortOption,
+                    awaiterCountMap.get(lastContest.getId()),
+                    reviewCountMap.get(lastContest.getId())
+            );
+            nextCursor = nextContestCursor.encode();
+        }
+
+        return new ContestPageResponse(responses, hasNext, nextCursor);
+    }*/
 
     @Transactional
     public BookmarkStatus toggleBookmark(Long contestId, UserDomain user) {
         Contest contest = findContestById(contestId);
 
         BookmarkStatus status = bookmarkService.toggleBookmark(contest, user.getId());
-        if (status.equals(BookmarkStatus.BOOKMARK)) {
-            contest.incrementBookmarkCount();
-        } else {
-            contest.decrementBookmarkCount();
-        }
+        updateBookmarkCount(status, contest);
         contestRepository.save(contest);
         return status;
     }
@@ -206,7 +237,6 @@ public class ContestService {
     public ContestContentResponse getContestContent(Long contestId) {
         Contest contestWithImages = contestRepository.findByIdWithContentImages(contestId)
                 .orElseThrow(() -> new ContestException(ContestErrorResult.CONTEST_NOT_EXIST));
-
         Contest contestWithAttachments = contestRepository.findByIdWithAttachments(contestId)
                 .orElseThrow(() -> new ContestException(ContestErrorResult.CONTEST_NOT_EXIST));
 
@@ -227,4 +257,11 @@ public class ContestService {
         });
     }
 
+    private void updateBookmarkCount(BookmarkStatus status, Contest contest) {
+        if (status.equals(BookmarkStatus.BOOKMARK)) {
+            contest.incrementBookmarkCount();
+        } else {
+            contest.decrementBookmarkCount();
+        }
+    }
 }
