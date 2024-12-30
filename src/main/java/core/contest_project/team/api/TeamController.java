@@ -5,6 +5,8 @@ import core.contest_project.team.dto.response.*;
 import core.contest_project.team.entity.member.TeamMemberId;
 import core.contest_project.team.service.TeamService;
 import core.contest_project.user.dto.response.UserBriefProfileResponse;
+import core.contest_project.user.dto.response.UserChatProfileResponse;
+import core.contest_project.user.entity.User;
 import core.contest_project.user.service.data.UserDomain;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -229,5 +231,17 @@ public class TeamController {
     ) {
         List<TeamSimpleResponse> teams = teamService.getLeadingTeams(user.getId());
         return ResponseEntity.ok(teams);
+    }
+
+
+    @GetMapping("/team-members")
+    public ResponseEntity<List<UserChatProfileResponse>> getTeamMembers(@AuthenticationPrincipal UserDomain user){
+        List<User> allUsersOfTeamsByUserId = teamService.findAllUsersOfTeamsByUserId(user.getId());
+        List<UserChatProfileResponse> responses = allUsersOfTeamsByUserId.stream()
+                .map(UserChatProfileResponse::from)
+                .toList();
+
+        return ResponseEntity.ok(responses);
+
     }
 }

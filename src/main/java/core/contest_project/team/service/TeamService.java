@@ -397,4 +397,39 @@ public class TeamService {
         TeamMemberId memberId = new TeamMemberId(teamId, userId);
         teamMemberRepository.deleteById(memberId);
     }
+
+
+    /**
+     * @param userId
+     * @return
+     * 
+     * @apiNote 
+     * 
+     * 내가 참여하고 있는 모든 팀의 팀원들 조회.
+     */
+    public List<User> findAllUsersOfTeamsByUserId(Long userId){
+        // 나의 teamMember 조회
+        List<TeamMember> myTeamMembers = teamMemberRepository.findAllByUserId(userId);
+
+        // 내가 참여하고 있는 teamId
+        List<Long> teamIds = myTeamMembers.stream()
+                .map(teamMember -> teamMember.getTeam().getId())
+                .toList();
+
+        // 내가 참여하고 있는 모든 팀의 팀원들
+        List<TeamMember> allByTeamIds = teamMemberRepository.findAllByTeamIds(teamIds);
+
+        List<User> responses=new ArrayList<>();
+        for (TeamMember teamMember : allByTeamIds) {
+            User user = teamMember.getUser();
+
+            // 1) 나 or 중복 유저 필터링
+            if(user.getId().equals(userId) || responses.contains(user)){continue;}
+
+            responses.add(user);
+        }
+
+        return responses;
+
+    }
 }
