@@ -1,5 +1,5 @@
 package core.contest_project.notification;
 
 public enum NotificationType {
-    COMMENT_ON_POST, REPLY_ON_COMMENT
+    COMMENT_ON_POST, REPLY_ON_COMMENT, NEW_TEAM_MEMBER
 }
